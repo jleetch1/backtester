@@ -15,7 +15,6 @@ import pandas as pd
 from strategies.base_strategy import PositionSizingMethod
 from core.symbol_manager import SymbolManager
 from PyQt6.QtGui import QFocusEvent
-from typing import List
 
 class NumberTableWidgetItem(QTableWidgetItem):
     def __init__(self, value):
@@ -48,33 +47,9 @@ class SymbolLineEdit(QLineEdit):
         self.symbol_manager = symbol_manager
         self.menu = None
         
-        # Create layout for the widget
-        self.layout = QHBoxLayout()
-        self.layout.setContentsMargins(0, 0, 0, 0)
-        self.layout.setSpacing(0)
-        
-        # Create container widget
-        self.container = QWidget(parent)
-        self.container.setLayout(self.layout)
-        
-        # Add line edit to layout
-        self.line_edit = QLineEdit()
-        self.layout.addWidget(self.line_edit)
-        
-        # Add dropdown button
-        self.dropdown_button = QPushButton("▼")
-        self.dropdown_button.setMaximumWidth(20)
-        self.dropdown_button.clicked.connect(self.showSymbolMenu)
-        self.layout.addWidget(self.dropdown_button)
-    
-    def text(self):
-        return self.line_edit.text()
-    
-    def setText(self, text):
-        self.line_edit.setText(text)
-    
-    def setPlaceholderText(self, text):
-        self.line_edit.setPlaceholderText(text)
+    def focusInEvent(self, event: QFocusEvent):
+        super().focusInEvent(event)
+        self.showSymbolMenu()
     
     def showSymbolMenu(self):
         if self.menu is not None:
@@ -98,16 +73,16 @@ class SymbolLineEdit(QLineEdit):
             no_symbols.setEnabled(False)
         
         # Position menu below the line edit
-        self.menu.exec(self.dropdown_button.mapToGlobal(self.dropdown_button.rect().bottomLeft()))
+        self.menu.exec(self.mapToGlobal(self.rect().bottomLeft()))
     
     def addSymbol(self, symbol: str):
         """Add selected symbol to current text"""
-        current_text = self.line_edit.text().strip()
+        current_text = self.text().strip()
         symbols = [s.strip() for s in current_text.split(',') if s.strip()]
         
         if symbol not in symbols:
             symbols.append(symbol)
-            self.line_edit.setText(', '.join(symbols))
+            self.setText(', '.join(symbols))
 
 class MainWindow(QMainWindow):
     STOCK_TIMEFRAME_LIMITS = {
@@ -170,37 +145,17 @@ class MainWindow(QMainWindow):
         symbol_layout = QVBoxLayout()
         symbol_layout.addWidget(QLabel("Symbols:"))
         
-        # Stock symbols container
-        stock_container = QWidget()
-        stock_layout = QHBoxLayout(stock_container)
-        stock_layout.setContentsMargins(0, 0, 0, 0)
-        
-        self.stock_symbols = QLineEdit()
+        # Stock symbols
+        self.stock_symbols = SymbolLineEdit("stock", self.symbol_manager)
         self.stock_symbols.setPlaceholderText("Stock symbols (comma-separated, e.g., AAPL,GOOGL)")
-        stock_layout.addWidget(self.stock_symbols)
+        self.stock_symbols.textChanged.connect(self.update_timeframe_options)
+        symbol_layout.addWidget(self.stock_symbols)
         
-        stock_dropdown = QPushButton("▼")
-        stock_dropdown.setMaximumWidth(20)
-        stock_dropdown.clicked.connect(lambda: self.show_symbol_menu("stock"))
-        stock_layout.addWidget(stock_dropdown)
-        
-        symbol_layout.addWidget(stock_container)
-        
-        # Crypto symbols container
-        crypto_container = QWidget()
-        crypto_layout = QHBoxLayout(crypto_container)
-        crypto_layout.setContentsMargins(0, 0, 0, 0)
-        
-        self.crypto_symbols = QLineEdit()
+        # Crypto symbols
+        self.crypto_symbols = SymbolLineEdit("crypto", self.symbol_manager)
         self.crypto_symbols.setPlaceholderText("Crypto pairs (comma-separated, e.g., BTC/USDT,ETH/USDT)")
-        crypto_layout.addWidget(self.crypto_symbols)
-        
-        crypto_dropdown = QPushButton("▼")
-        crypto_dropdown.setMaximumWidth(20)
-        crypto_dropdown.clicked.connect(lambda: self.show_symbol_menu("crypto"))
-        crypto_layout.addWidget(crypto_dropdown)
-        
-        symbol_layout.addWidget(crypto_container)
+        self.crypto_symbols.textChanged.connect(self.update_timeframe_options)
+        symbol_layout.addWidget(self.crypto_symbols)
         
         controls_layout.addLayout(symbol_layout)
         
@@ -797,41 +752,6 @@ class MainWindow(QMainWindow):
             self.symbol_manager.add_stock_symbols(stock_symbols)
         if crypto_symbols:
             self.symbol_manager.add_crypto_symbols(crypto_symbols)
-
-    def show_symbol_menu(self, symbol_type: str):
-        """Show the symbol selection menu"""
-        menu = PersistentMenu(self)
-        
-        # Get symbols based on type
-        symbols = (self.symbol_manager.get_stock_symbols() 
-                  if symbol_type == "stock" 
-                  else self.symbol_manager.get_crypto_symbols())
-        
-        # Add recent symbols
-        if symbols:
-            for symbol in symbols:
-                action = menu.addAction(symbol)
-                action.triggered.connect(
-                    lambda checked, s=symbol, t=symbol_type: 
-                    self.add_symbol(s, t))
-        else:
-            # Show placeholder text if no symbols
-            no_symbols = menu.addAction("No recent symbols")
-            no_symbols.setEnabled(False)
-        
-        # Show menu under the appropriate dropdown button
-        button = self.sender()
-        menu.exec(button.mapToGlobal(button.rect().bottomLeft()))
-
-    def add_symbol(self, symbol: str, symbol_type: str):
-        """Add selected symbol to appropriate input field"""
-        line_edit = self.stock_symbols if symbol_type == "stock" else self.crypto_symbols
-        current_text = line_edit.text().strip()
-        symbols = [s.strip() for s in current_text.split(',') if s.strip()]
-        
-        if symbol not in symbols:
-            symbols.append(symbol)
-            line_edit.setText(', '.join(symbols))
 
 class TradeDetailsDialog(QDialog):
     def __init__(self, trades, price_data):
