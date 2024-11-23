@@ -1,6 +1,6 @@
 from PyQt6.QtWidgets import (QMainWindow, QWidget, QVBoxLayout, QHBoxLayout,
                             QPushButton, QLabel, QDateEdit, QDoubleSpinBox,
-                            QTableWidget, QTableWidgetItem, QTabWidget, QLineEdit, QMessageBox, QComboBox, QDialog, QSplitter, QCheckBox)
+                            QTableWidget, QTableWidgetItem, QTabWidget, QLineEdit, QMessageBox, QComboBox, QDialog, QSplitter)
 from PyQt6.QtCore import Qt, QDate
 import sys
 from datetime import datetime
@@ -151,25 +151,14 @@ class MainWindow(QMainWindow):
         
         # Strategy selection layout
         strategy_layout = QVBoxLayout()
-        strategy_layout.addWidget(QLabel("Select Strategies:"))
+        strategy_layout.addWidget(QLabel("Select Strategy:"))
 
-        # Create a widget to hold strategy checkboxes
-        self.strategy_selector = QWidget()
-        self.strategy_selector_layout = QVBoxLayout(self.strategy_selector)
-        
-        # Create a combobox that shows/hides strategy selector
-        self.strategy_dropdown = QPushButton("Select Strategies ▼")
-        self.strategy_dropdown.clicked.connect(self.toggle_strategy_selector)
-        strategy_layout.addWidget(self.strategy_dropdown)
-        
-        # Initialize strategy checkboxes dictionary
-        self.strategy_checkboxes = {}
-        
-        # Add strategy selector (initially hidden)
-        self.strategy_selector.hide()
-        strategy_layout.addWidget(self.strategy_selector)
+        self.strategy_selection = QComboBox()
+        self.strategy_selection.addItem("FlawlessVictoryStrategy")
+        # Add other strategies if needed
+        strategy_layout.addWidget(self.strategy_selection)
 
-        # Version selection remains the same
+        # Strategy version selection
         self.version_selection = QComboBox()
         self.version_selection.addItems(["1", "2", "3"])
         strategy_layout.addWidget(QLabel("Select Version:"))
@@ -200,17 +189,10 @@ class MainWindow(QMainWindow):
         self.timeframe_selection.currentTextChanged.connect(self.on_timeframe_changed)
         
     def load_strategies(self):
-        """Load available strategies and create checkboxes"""
         self.strategies = []
         strategies_dir = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'strategies')
         
         sys.path.append(os.path.dirname(os.path.dirname(__file__)))
-        
-        # Clear existing checkboxes
-        for checkbox in self.strategy_checkboxes.values():
-            self.strategy_selector_layout.removeWidget(checkbox)
-            checkbox.deleteLater()
-        self.strategy_checkboxes.clear()
         
         for file in os.listdir(strategies_dir):
             if file.endswith('.py') and file != '__init__.py' and file != 'base_strategy.py':
@@ -221,24 +203,11 @@ class MainWindow(QMainWindow):
                     for item in dir(module):
                         obj = getattr(module, item)
                         if isinstance(obj, type) and item != 'BaseStrategy':
-                            # Create checkbox for the strategy
-                            checkbox = QCheckBox(item)
-                            checkbox.setChecked(True)  # Default to checked
-                            self.strategy_checkboxes[item] = checkbox
-                            self.strategy_selector_layout.addWidget(checkbox)
                             self.strategies.append(obj)
                 except ImportError as e:
                     print(f"Error importing {module_name}: {e}")
-
-    def run_backtest(self):
-        # Get selected strategies
-        selected_strategies = [strategy for strategy in self.strategies 
-                             if self.strategy_checkboxes[strategy.__name__].isChecked()]
         
-        if not selected_strategies:
-            QMessageBox.warning(self, "Warning", "Please select at least one strategy")
-            return
-            
+    def run_backtest(self):
         # Clear existing tabs
         while self.tabs.count():
             self.tabs.removeTab(0)
@@ -328,9 +297,9 @@ class MainWindow(QMainWindow):
                     )
                     continue
                     
-                # Run only selected strategies
+                # Run strategies
                 results = []
-                for strategy_class in selected_strategies:
+                for strategy_class in self.strategies:
                     if strategy_class.__name__ == "FlawlessVictoryStrategy":
                         version = int(self.version_selection.currentText())
                         strategy = strategy_class(self.initial_capital.value(), version=version)
@@ -642,15 +611,6 @@ class MainWindow(QMainWindow):
         
         # Update the sort order state
         self.sort_order_state[table][section] = new_order
-
-    def toggle_strategy_selector(self):
-        """Toggle the visibility of the strategy selector"""
-        if self.strategy_selector.isHidden():
-            self.strategy_selector.show()
-            self.strategy_dropdown.setText("Select Strategies ▲")
-        else:
-            self.strategy_selector.hide()
-            self.strategy_dropdown.setText("Select Strategies ▼")
 
 class TradeDetailsDialog(QDialog):
     def __init__(self, trades, price_data):
