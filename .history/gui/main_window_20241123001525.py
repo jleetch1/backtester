@@ -14,16 +14,6 @@ import matplotlib.pyplot as plt
 import pandas as pd
 from strategies.base_strategy import PositionSizingMethod
 
-class NumberTableWidgetItem(QTableWidgetItem):
-    def __init__(self, value):
-        super().__init__(str(value))
-        self.value = value
-
-    def __lt__(self, other):
-        if isinstance(other, NumberTableWidgetItem):
-            return self.value < other.value
-        return super().__lt__(other)
-
 class MainWindow(QMainWindow):
     STOCK_TIMEFRAME_LIMITS = {
         '1m': 7,
@@ -350,8 +340,9 @@ class MainWindow(QMainWindow):
                     table.setItem(i, 1, net_profit_item)
                     
                     # Total Trades (numerical)
-                    total_trades = int(result['total_trades'])
-                    trades_item = NumberTableWidgetItem(total_trades)
+                    trades_item = QTableWidgetItem()
+                    trades_item.setData(Qt.ItemDataRole.DisplayRole, str(result['total_trades']))
+                    trades_item.setData(Qt.ItemDataRole.UserRole, int(result['total_trades']))
                     table.setItem(i, 2, trades_item)
                     
                     # Win Rate (numerical)
@@ -420,8 +411,9 @@ class MainWindow(QMainWindow):
             summary_table.setItem(i, 1, net_profit_item)
             
             # Total Trades
-            total_trades = int(results['total_trades'])
-            trades_item = NumberTableWidgetItem(total_trades)
+            trades_item = QTableWidgetItem()
+            trades_item.setData(Qt.ItemDataRole.DisplayRole, str(results['total_trades']))
+            trades_item.setData(Qt.ItemDataRole.UserRole, int(results['total_trades']))
             summary_table.setItem(i, 2, trades_item)
             
             # Win Rate

@@ -14,16 +14,6 @@ import matplotlib.pyplot as plt
 import pandas as pd
 from strategies.base_strategy import PositionSizingMethod
 
-class NumberTableWidgetItem(QTableWidgetItem):
-    def __init__(self, value):
-        super().__init__(str(value))
-        self.value = value
-
-    def __lt__(self, other):
-        if isinstance(other, NumberTableWidgetItem):
-            return self.value < other.value
-        return super().__lt__(other)
-
 class MainWindow(QMainWindow):
     STOCK_TIMEFRAME_LIMITS = {
         '1m': 7,
@@ -338,45 +328,21 @@ class MainWindow(QMainWindow):
                 # Fill table
                 table.setRowCount(len(results))
                 for i, (strategy_name, result) in enumerate(results):
-                    # Strategy name (text)
                     strategy_item = QTableWidgetItem(strategy_name)
-                    strategy_item.setData(Qt.ItemDataRole.DisplayRole, strategy_name)
+                    
+                    # Add tooltip with strategy description
+                    for strategy_class in self.strategies:
+                        if strategy_class.__name__ == strategy_name:
+                            strategy_item.setToolTip(strategy_class.description)
+                            break
+                    
                     table.setItem(i, 0, strategy_item)
-                    
-                    # Net Profit (numerical)
-                    net_profit_item = QTableWidgetItem()
-                    net_profit_item.setData(Qt.ItemDataRole.DisplayRole, f"${result['net_profit']:.2f}")
-                    net_profit_item.setData(Qt.ItemDataRole.EditRole, float(result['net_profit']))
-                    table.setItem(i, 1, net_profit_item)
-                    
-                    # Total Trades (numerical)
-                    total_trades = int(result['total_trades'])
-                    trades_item = NumberTableWidgetItem(total_trades)
-                    table.setItem(i, 2, trades_item)
-                    
-                    # Win Rate (numerical)
-                    win_rate_item = QTableWidgetItem()
-                    win_rate_item.setData(Qt.ItemDataRole.DisplayRole, f"{result['win_rate']:.1f}%")
-                    win_rate_item.setData(Qt.ItemDataRole.EditRole, float(result['win_rate']))
-                    table.setItem(i, 3, win_rate_item)
-                    
-                    # Profit Factor (numerical)
-                    pf_item = QTableWidgetItem()
-                    pf_item.setData(Qt.ItemDataRole.DisplayRole, f"{result['profit_factor']:.2f}")
-                    pf_item.setData(Qt.ItemDataRole.EditRole, float(result['profit_factor']))
-                    table.setItem(i, 4, pf_item)
-                    
-                    # Max Drawdown (numerical)
-                    dd_item = QTableWidgetItem()
-                    dd_item.setData(Qt.ItemDataRole.DisplayRole, f"{result['max_drawdown']:.1f}%")
-                    dd_item.setData(Qt.ItemDataRole.EditRole, float(result['max_drawdown']))
-                    table.setItem(i, 5, dd_item)
-                    
-                    # Avg Trade (numerical)
-                    avg_trade_item = QTableWidgetItem()
-                    avg_trade_item.setData(Qt.ItemDataRole.DisplayRole, f"${result['avg_trade']:.2f}")
-                    avg_trade_item.setData(Qt.ItemDataRole.EditRole, float(result['avg_trade']))
-                    table.setItem(i, 6, avg_trade_item)
+                    table.setItem(i, 1, QTableWidgetItem(f"${result['net_profit']:.2f}"))
+                    table.setItem(i, 2, QTableWidgetItem(str(result['total_trades'])))
+                    table.setItem(i, 3, QTableWidgetItem(f"{result['win_rate']:.1f}%"))
+                    table.setItem(i, 4, QTableWidgetItem(f"{result['profit_factor']:.2f}"))
+                    table.setItem(i, 5, QTableWidgetItem(f"{result['max_drawdown']:.1f}%"))
+                    table.setItem(i, 6, QTableWidgetItem(f"${result['avg_trade']:.2f}"))
                     
                 # Enable sorting on the table
                 table.setSortingEnabled(True)
@@ -410,51 +376,38 @@ class MainWindow(QMainWindow):
         summary_table.setRowCount(len(aggregated_results))
         for i, (strategy_name, results) in enumerate(aggregated_results.items()):
             # Strategy name
-            strategy_item = QTableWidgetItem(strategy_name)
-            summary_table.setItem(i, 0, strategy_item)
+            summary_table.setItem(i, 0, QTableWidgetItem(strategy_name))
             
             # Net Profit
-            net_profit_item = QTableWidgetItem()
-            net_profit_item.setData(Qt.ItemDataRole.DisplayRole, f"${results['net_profit']:,.2f}")
-            net_profit_item.setData(Qt.ItemDataRole.EditRole, float(results['net_profit']))
+            net_profit_item = QTableWidgetItem(f"${results['net_profit']:,.2f}")
+            net_profit_item.setTextAlignment(Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter)
             summary_table.setItem(i, 1, net_profit_item)
             
             # Total Trades
-            total_trades = int(results['total_trades'])
-            trades_item = NumberTableWidgetItem(total_trades)
-            summary_table.setItem(i, 2, trades_item)
+            summary_table.setItem(i, 2, QTableWidgetItem(str(results['total_trades'])))
             
             # Win Rate
             if results['total_trades'] > 0:
                 win_rate = (results['winning_trades'] / results['total_trades']) * 100
-                win_rate_item = QTableWidgetItem()
-                win_rate_item.setData(Qt.ItemDataRole.DisplayRole, f"{win_rate:.1f}%")
-                win_rate_item.setData(Qt.ItemDataRole.EditRole, float(win_rate))
+                win_rate_item = QTableWidgetItem(f"{win_rate:.1f}%")
             else:
                 win_rate_item = QTableWidgetItem("N/A")
             summary_table.setItem(i, 3, win_rate_item)
             
             # Profit Factor
-            pf_item = QTableWidgetItem()
-            pf_item.setData(Qt.ItemDataRole.DisplayRole, f"{results['profit_factor']:.2f}")
-            pf_item.setData(Qt.ItemDataRole.EditRole, float(results['profit_factor']))
-            summary_table.setItem(i, 4, pf_item)
+            profit_factor_item = QTableWidgetItem(f"{results['profit_factor']:.2f}")
+            summary_table.setItem(i, 4, profit_factor_item)
             
             # Max Drawdown
-            dd_item = QTableWidgetItem()
-            dd_item.setData(Qt.ItemDataRole.DisplayRole, f"{results['max_drawdown']:.1f}%")
-            dd_item.setData(Qt.ItemDataRole.EditRole, float(results['max_drawdown']))
-            summary_table.setItem(i, 5, dd_item)
+            max_dd_item = QTableWidgetItem(f"{results['max_drawdown']:.1f}%")
+            summary_table.setItem(i, 5, max_dd_item)
             
             # Number of symbols tested
-            symbols_count_item = QTableWidgetItem()
-            symbols_count_item.setData(Qt.ItemDataRole.DisplayRole, str(results['total_symbols']))
-            symbols_count_item.setData(Qt.ItemDataRole.EditRole, int(results['total_symbols']))
-            summary_table.setItem(i, 6, symbols_count_item)
+            summary_table.setItem(i, 6, QTableWidgetItem(str(results['total_symbols'])))
             
-            # List of symbols (text)
+            # List of symbols
             symbols_item = QTableWidgetItem(", ".join(results['symbols']))
-            symbols_item.setToolTip(", ".join(results['symbols']))
+            symbols_item.setToolTip(", ".join(results['symbols']))  # Show full list on hover
             summary_table.setItem(i, 7, symbols_item)
             
             # Color coding based on performance
