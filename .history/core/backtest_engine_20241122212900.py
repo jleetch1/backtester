@@ -1,14 +1,12 @@
 import pandas as pd
 from typing import List, Dict
 from strategies.base_strategy import BaseStrategy
-from collections import defaultdict
 
 class BacktestEngine:
     def __init__(self, initial_capital: float):
         self.initial_capital = initial_capital
-        self.trade_details = defaultdict(list)  # Initialize a defaultdict to store trades per (ticker, strategy)
         
-    def run_backtest(self, data: pd.DataFrame, strategy: BaseStrategy, ticker: str) -> Dict:
+    def run_backtest(self, data: pd.DataFrame, strategy: BaseStrategy) -> Dict:
         df = strategy.generate_signals(data)
         
         # Initialize results
@@ -52,25 +50,8 @@ class BacktestEngine:
                 'profit': trade_profit
             })
                 
-        # Store trades for the given ticker and strategy
-        strategy_name = strategy.__class__.__name__
-        self.trade_details[(ticker, strategy_name)] = trades
-            
         return self._calculate_statistics(trades, capital)
     
-    def has_trades(self, ticker, strategy_name):
-        # Debug print
-        print(f"Checking trades for {ticker}, {strategy_name}")
-        print(f"Available keys: {self.trade_details.keys()}")
-        return bool(self.trade_details.get((ticker, strategy_name), []))
-    
-    def get_trade_details(self, ticker, strategy_name):
-        # Debug print
-        print(f"Getting trades for {ticker}, {strategy_name}")
-        trades = self.trade_details.get((ticker, strategy_name), [])
-        print(f"Found {len(trades)} trades")
-        return trades
-
     def _calculate_statistics(self, trades: List[Dict], final_capital: float) -> Dict:
         if not trades:
             return {
@@ -133,3 +114,13 @@ class BacktestEngine:
             max_drawdown = max(max_drawdown, drawdown)
             
         return max_drawdown 
+
+    def has_trades(self, ticker, strategy):
+        return bool(self.get_trade_details(ticker, strategy))
+
+    def get_trade_details(self, ticker, strategy):
+        # Implementation to fetch trade details for the given ticker and strategy
+        # This should return a list of dictionaries containing trade information
+        trades = []
+        # ... logic to populate trades ...
+        return trades

@@ -58,18 +58,13 @@ class BacktestEngine:
             
         return self._calculate_statistics(trades, capital)
     
-    def has_trades(self, ticker, strategy_name):
-        # Debug print
-        print(f"Checking trades for {ticker}, {strategy_name}")
-        print(f"Available keys: {self.trade_details.keys()}")
+    def has_trades(self, ticker, strategy):
+        strategy_name = strategy.__class__.__name__
         return bool(self.trade_details.get((ticker, strategy_name), []))
     
-    def get_trade_details(self, ticker, strategy_name):
-        # Debug print
-        print(f"Getting trades for {ticker}, {strategy_name}")
-        trades = self.trade_details.get((ticker, strategy_name), [])
-        print(f"Found {len(trades)} trades")
-        return trades
+    def get_trade_details(self, ticker, strategy):
+        strategy_name = strategy.__class__.__name__
+        return self.trade_details.get((ticker, strategy_name), [])
 
     def _calculate_statistics(self, trades: List[Dict], final_capital: float) -> Dict:
         if not trades:

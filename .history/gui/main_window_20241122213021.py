@@ -15,11 +15,7 @@ class MainWindow(QMainWindow):
         self.setWindowTitle("Backtesting Application")
         self.setMinimumSize(1200, 800)
         
-        # Initialize UI first
         self.init_ui()
-        # Then initialize backtest_engine with the now-existing initial_capital
-        self.backtest_engine = BacktestEngine(self.initial_capital.value())
-        
         self.load_strategies()
         
     def init_ui(self):
@@ -138,7 +134,7 @@ class MainWindow(QMainWindow):
             return
         
         data_fetcher = DataFetcher()
-        self.backtest_engine = BacktestEngine(self.initial_capital.value())
+        backtest_engine = BacktestEngine(self.initial_capital.value())
         
         start_date = self.start_date.date().toPyDate()
         end_date = self.end_date.date().toPyDate()
@@ -173,8 +169,8 @@ class MainWindow(QMainWindow):
                     else:
                         strategy = strategy_class(self.initial_capital.value())
                     
-                    # Use the instance attribute backtest_engine
-                    result = self.backtest_engine.run_backtest(data, strategy, ticker=symbol)
+                    # Pass the ticker symbol to the backtest_engine
+                    result = backtest_engine.run_backtest(data, strategy, ticker=symbol)
                     results.append((strategy_class.__name__, result))
                     
                 # Fill table
@@ -205,21 +201,18 @@ class MainWindow(QMainWindow):
         selected_strategy = self.get_selected_strategy()
         
         if not selected_ticker or not selected_strategy:
-            QMessageBox.warning(self, "Selection Error", "Please select a strategy row in the results table.")
+            QMessageBox.warning(self, "Selection Error", "Please select a ticker and a strategy.")
             return
         
-        # Debug print to see what values we're working with
-        print(f"Selected ticker: {selected_ticker}")
-        print(f"Selected strategy: {selected_strategy}")
-        print(f"Available trades: {self.backtest_engine.trade_details.keys()}")
-        
-        trades = self.backtest_engine.get_trade_details(selected_ticker, selected_strategy)
-        if trades:
-            trade_details_dialog = TradeDetailsDialog(trades)
-            trade_details_dialog.exec()
+        if self.backtest_engine.has_trades(selected_ticker, selected_strategy):
+            trades = self.backtest_engine.get_trade_details(selected_ticker, selected_strategy)
+            if trades:
+                trade_details_dialog = TradeDetailsDialog(trades)
+                trade_details_dialog.exec()
+            else:
+                QMessageBox.information(self, "No Trades", "There are no simulated trades for the selected ticker and strategy.")
         else:
-            QMessageBox.information(self, "No Trades", 
-                f"No trades found for {selected_ticker} with {selected_strategy}")
+            QMessageBox.information(self, "No Trades", "There are no simulated trades for the selected ticker and strategy.")
 
     def get_selected_ticker(self):
         # Get the currently selected symbol from the active tab
@@ -233,12 +226,13 @@ class MainWindow(QMainWindow):
         # Get the selected strategy from the table in the active tab
         current_tab = self.tabs.currentWidget()
         if isinstance(current_tab, QTableWidget):
-            selected_rows = current_tab.selectedItems()
-            if selected_rows:
-                # Get the strategy name from the first column (index 0) of the selected row
-                row = selected_rows[0].row()
-                strategy_name = current_tab.item(row, 0).text()
-                return strategy_name
+            selected_items = current_tab.selectedItems()
+            if not selected_items:
+                return None
+            # Assuming the first column is the strategy name
+            strategy_item = selected_items[0]
+            strategy_name = strategy_item.text()
+            return strategy_name
         return None
 
 class TradeDetailsDialog(QDialog):
