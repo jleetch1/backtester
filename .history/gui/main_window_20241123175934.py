@@ -24,20 +24,6 @@ class NumberTableWidgetItem(QTableWidgetItem):
             return self.value < other.value
         return super().__lt__(other)
 
-class PersistentMenu(QMenu):
-    def mouseReleaseEvent(self, e):
-        action = self.activeAction()
-        if action and action.isCheckable():
-            action.trigger()
-            # Prevent menu from closing
-            e.ignore()
-        elif action and (action.text() == "Select All" or action.text() == "Deselect All"):
-            action.trigger()
-            # Prevent menu from closing
-            e.ignore()
-        else:
-            super().mouseReleaseEvent(e)
-
 class MainWindow(QMainWindow):
     STOCK_TIMEFRAME_LIMITS = {
         '1m': 7,
@@ -651,7 +637,7 @@ class MainWindow(QMainWindow):
 
     def show_strategy_menu(self):
         """Show the strategy selection menu"""
-        menu = PersistentMenu(self)
+        menu = QMenu(self)
         
         # Add "Select All" and "Deselect All" options
         select_all = menu.addAction("Select All")
@@ -666,30 +652,24 @@ class MainWindow(QMainWindow):
             action.setChecked(checkbox.isChecked())
             strategy_actions[action] = strategy_name
         
-        # Connect actions to handlers
-        select_all.triggered.connect(lambda: self.handle_select_all(True, strategy_actions))
-        deselect_all.triggered.connect(lambda: self.handle_select_all(False, strategy_actions))
-        
-        for action, strategy_name in strategy_actions.items():
-            action.triggered.connect(lambda checked, s=strategy_name: self.handle_strategy_selection(s, checked))
-        
         # Show menu under the button
-        menu.exec(self.strategy_dropdown.mapToGlobal(self.strategy_dropdown.rect().bottomLeft()))
-
-    def handle_select_all(self, select: bool, strategy_actions: dict):
-        """Handle Select All / Deselect All actions"""
-        for action in strategy_actions:
-            action.setChecked(select)
-            self.strategy_checkboxes[strategy_actions[action]].setChecked(select)
-        self.update_strategy_count()
-
-    def handle_strategy_selection(self, strategy_name: str, checked: bool):
-        """Handle individual strategy selection"""
-        self.strategy_checkboxes[strategy_name].setChecked(checked)
-        self.update_strategy_count()
-
-    def update_strategy_count(self):
-        """Update the strategy count in the button text"""
+        action = menu.exec(self.strategy_dropdown.mapToGlobal(self.strategy_dropdown.rect().bottomLeft()))
+        
+        if action:
+            if action == select_all:
+                # Select all strategies
+                for checkbox in self.strategy_checkboxes.values():
+                    checkbox.setChecked(True)
+            elif action == deselect_all:
+                # Deselect all strategies
+                for checkbox in self.strategy_checkboxes.values():
+                    checkbox.setChecked(False)
+            elif action in strategy_actions:
+                # Toggle individual strategy
+                strategy_name = strategy_actions[action]
+                self.strategy_checkboxes[strategy_name].setChecked(action.isChecked())
+        
+        # Update button text to show number of selected strategies
         selected_count = sum(1 for checkbox in self.strategy_checkboxes.values() if checkbox.isChecked())
         total_count = len(self.strategy_checkboxes)
         self.strategy_dropdown.setText(f"Strategies ({selected_count}/{total_count}) ▼")
