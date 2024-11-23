@@ -14,37 +14,6 @@ import matplotlib.pyplot as plt
 import pandas as pd
 
 class MainWindow(QMainWindow):
-    STOCK_TIMEFRAME_LIMITS = {
-        '1m': 7,
-        '2m': 60,
-        '5m': 60,
-        '15m': 60,
-        '30m': 60,
-        '60m': 730,
-        '1h': 730,
-        '1d': float('inf'),
-        '1wk': float('inf'),
-        '1mo': float('inf')
-    }
-    
-    CRYPTO_TIMEFRAME_LIMITS = [
-        ('1m', float('inf')),
-        ('3m', float('inf')),
-        ('5m', float('inf')),
-        ('15m', float('inf')),
-        ('30m', float('inf')),
-        ('1h', float('inf')),
-        ('2h', float('inf')),
-        ('4h', float('inf')),
-        ('6h', float('inf')),
-        ('8h', float('inf')),
-        ('12h', float('inf')),
-        ('1d', float('inf')),
-        ('3d', float('inf')),
-        ('1w', float('inf')),
-        ('1M', float('inf'))
-    ]
-
     def __init__(self):
         super().__init__()
         self.setWindowTitle("Backtesting Application")
@@ -351,7 +320,7 @@ class MainWindow(QMainWindow):
         
         if crypto_symbols and not stock_symbols:
             # For crypto only - all timeframes available
-            timeframes = [tf for tf, _ in self.CRYPTO_TIMEFRAME_LIMITS]
+            timeframes = [tf for tf, _ in crypto_timeframe_limits]
             self.timeframe_selection.addItems(timeframes)
             # Restore previous selection if it was crypto, otherwise use 1m
             if current_selection in timeframes:
@@ -359,8 +328,22 @@ class MainWindow(QMainWindow):
             else:
                 self.timeframe_selection.setCurrentText('1m')
         else:
+            # For stocks or mixed symbols
+            timeframe_limits = {
+                '1m': 7,
+                '2m': 60,
+                '5m': 60,
+                '15m': 60,
+                '30m': 60,
+                '60m': 730,
+                '1h': 730,
+                '1d': float('inf'),
+                '1wk': float('inf'),
+                '1mo': float('inf')
+            }
+            
             # Get available timeframes based on date range
-            available_timeframes = [tf for tf, limit in self.STOCK_TIMEFRAME_LIMITS.items() 
+            available_timeframes = [tf for tf, limit in timeframe_limits.items() 
                                   if days_difference <= limit]
             
             self.timeframe_selection.addItems(available_timeframes)

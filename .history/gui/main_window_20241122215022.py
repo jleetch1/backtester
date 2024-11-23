@@ -14,37 +14,6 @@ import matplotlib.pyplot as plt
 import pandas as pd
 
 class MainWindow(QMainWindow):
-    STOCK_TIMEFRAME_LIMITS = {
-        '1m': 7,
-        '2m': 60,
-        '5m': 60,
-        '15m': 60,
-        '30m': 60,
-        '60m': 730,
-        '1h': 730,
-        '1d': float('inf'),
-        '1wk': float('inf'),
-        '1mo': float('inf')
-    }
-    
-    CRYPTO_TIMEFRAME_LIMITS = [
-        ('1m', float('inf')),
-        ('3m', float('inf')),
-        ('5m', float('inf')),
-        ('15m', float('inf')),
-        ('30m', float('inf')),
-        ('1h', float('inf')),
-        ('2h', float('inf')),
-        ('4h', float('inf')),
-        ('6h', float('inf')),
-        ('8h', float('inf')),
-        ('12h', float('inf')),
-        ('1d', float('inf')),
-        ('3d', float('inf')),
-        ('1w', float('inf')),
-        ('1M', float('inf'))
-    ]
-
     def __init__(self):
         super().__init__()
         self.setWindowTitle("Backtesting Application")
@@ -147,12 +116,6 @@ class MainWindow(QMainWindow):
         # Results tabs
         self.tabs = QTabWidget()
         layout.addWidget(self.tabs)
-        
-        self.start_date.dateChanged.connect(self.on_date_changed)
-        self.end_date.dateChanged.connect(self.on_date_changed)
-        
-        # Add timeframe selection change handler
-        self.timeframe_selection.currentTextChanged.connect(self.on_timeframe_changed)
         
     def load_strategies(self):
         self.strategies = []
@@ -334,12 +297,9 @@ class MainWindow(QMainWindow):
         return None
 
     def update_timeframe_options(self):
-        """Update timeframe options while preserving user selection if possible"""
+        """Update timeframe options based on selected symbol type and date range"""
         stock_symbols = self.stock_symbols.text().strip()
         crypto_symbols = self.crypto_symbols.text().strip()
-        
-        # Store current selection before clearing
-        current_selection = self.timeframe_selection.currentText()
         
         # Clear current items
         self.timeframe_selection.clear()
@@ -350,59 +310,55 @@ class MainWindow(QMainWindow):
         days_difference = (end_date - start_date).days
         
         if crypto_symbols and not stock_symbols:
-            # For crypto only - all timeframes available
-            timeframes = [tf for tf, _ in self.CRYPTO_TIMEFRAME_LIMITS]
-            self.timeframe_selection.addItems(timeframes)
-            # Restore previous selection if it was crypto, otherwise use 1m
-            if current_selection in timeframes:
-                self.timeframe_selection.setCurrentText(current_selection)
-            else:
-                self.timeframe_selection.setCurrentText('1m')
+            # Only crypto symbols entered - all timeframes available
+            timeframes = DataFetcher.get_available_timeframes('crypto')
         else:
-            # Get available timeframes based on date range
-            available_timeframes = [tf for tf, limit in self.STOCK_TIMEFRAME_LIMITS.items() 
-                                  if days_difference <= limit]
+            # Stock symbols - filter timeframes based on date range
+            all_timeframes = DataFetcher.get_available_timeframes('stock')
+            timeframes = []
             
-            self.timeframe_selection.addItems(available_timeframes)
+            timeframe_limits = {
+                '1m': 7,
+                '2m': 60,
+                '5m': 60,
+                '15m': 60,
+                '30m': 60,
+                '60m': 730,
+                '1h': 730,
+                '1d': float('inf'),
+                '1wk': float('inf'),
+                '1mo': float('inf')
+            }
             
-            # Try to restore previous selection if valid
-            if current_selection in available_timeframes:
-                self.timeframe_selection.setCurrentText(current_selection)
-            else:
-                # Find the most granular available timeframe
-                self.timeframe_selection.setCurrentText(available_timeframes[0])
-
-    def validate_date_range(self):
-        """Validate date range and show appropriate warnings/info"""
-        start_date = self.start_date.date().toPyDate()
-        end_date = self.end_date.date().toPyDate()
-        days_difference = (end_date - start_date).days
+            for tf in all_timeframes:
+                if days_difference <= timeframe_limits.get(tf, 0):
+                    timeframes.append(tf)
         
-        stock_symbols = self.stock_symbols.text().strip()
-        message = ""
+        self.timeframe_selection.addItems(timeframes)
         
-        if stock_symbols:
-            if days_difference <= 7:
-                message = "Using 1-minute data for maximum granularity"
-            elif days_difference <= 60:
-                message = "Using 5-minute data (1-minute data only available for 7 days or less)"
-            elif days_difference <= 730:
-                message = "Using hourly data (minute data only available for 60 days or less)"
+        # Set appropriate default timeframe based on date range
+        if days_difference <= 7:
+            default_tf = '1m'
+        elif days_difference <= 60:
+            default_tf = '5m'
+        elif days_difference <= 730:
+            default_tf = '1h'
+        else:
+            default_tf = '1d'
+        
+        # Find the closest available timeframe to our default
+        if default_tf in timeframes:
+            default_index = timeframes.index(default_tf)
+        else:
+            # Find the next available larger timeframe
+            for tf in timeframes:
+                if timeframe_limits.get(tf, 0) >= days_difference:
+                    default_index = timeframes.index(tf)
+                    break
             else:
-                message = "Using daily data (hourly data only available for 730 days or less)"
-            
-            QMessageBox.information(self, "Data Granularity", message)
-
-    def on_date_changed(self):
-        """Handle date change events"""
-        self.update_timeframe_options()
-        # Only show validation message if user hasn't explicitly selected a timeframe
-        if not hasattr(self, '_user_selected_timeframe'):
-            self.validate_date_range()
-
-    def on_timeframe_changed(self, timeframe):
-        """Handle user timeframe selection"""
-        self._user_selected_timeframe = True
+                default_index = len(timeframes) - 1
+        
+        self.timeframe_selection.setCurrentIndex(default_index)
 
 class TradeDetailsDialog(QDialog):
     def __init__(self, trades, price_data):
