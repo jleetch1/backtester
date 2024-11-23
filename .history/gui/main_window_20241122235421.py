@@ -14,16 +14,6 @@ import matplotlib.pyplot as plt
 import pandas as pd
 from strategies.base_strategy import PositionSizingMethod
 
-class NumberTableWidgetItem(QTableWidgetItem):
-    def __init__(self, value):
-        super().__init__(str(value))
-        self.value = value
-
-    def __lt__(self, other):
-        if isinstance(other, NumberTableWidgetItem):
-            return self.value < other.value
-        return super().__lt__(other)
-
 class MainWindow(QMainWindow):
     STOCK_TIMEFRAME_LIMITS = {
         '1m': 7,
@@ -67,8 +57,6 @@ class MainWindow(QMainWindow):
         self.backtest_engine = BacktestEngine(self.initial_capital.value())
         
         self.load_strategies()
-        
-        self.sort_order_state = {}  # Add this to track sort orders
         
     def init_ui(self):
         central_widget = QWidget()
@@ -338,7 +326,8 @@ class MainWindow(QMainWindow):
                 # Fill table
                 table.setRowCount(len(results))
                 for i, (strategy_name, result) in enumerate(results):
-                    strategy_item = QTableWidgetItem(strategy_name)
+                    # Strategy name (text)
+                    strategy_item = SortableTableItem(strategy_name)
                     
                     # Add tooltip with strategy description
                     for strategy_class in self.strategies:
@@ -347,13 +336,47 @@ class MainWindow(QMainWindow):
                             break
                     
                     table.setItem(i, 0, strategy_item)
-                    table.setItem(i, 1, QTableWidgetItem(f"${result['net_profit']:.2f}"))
-                    table.setItem(i, 2, QTableWidgetItem(str(result['total_trades'])))
-                    table.setItem(i, 3, QTableWidgetItem(f"{result['win_rate']:.1f}%"))
-                    table.setItem(i, 4, QTableWidgetItem(f"{result['profit_factor']:.2f}"))
-                    table.setItem(i, 5, QTableWidgetItem(f"{result['max_drawdown']:.1f}%"))
-                    table.setItem(i, 6, QTableWidgetItem(f"${result['avg_trade']:.2f}"))
                     
+                    # Net Profit (numeric)
+                    table.setItem(i, 1, SortableTableItem(
+                        result['net_profit'], 
+                        f"${result['net_profit']:.2f}"
+                    ))
+                    
+                    # Total Trades (numeric)
+                    table.setItem(i, 2, SortableTableItem(
+                        result['total_trades'], 
+                        str(result['total_trades'])
+                    ))
+                    
+                    # Win Rate (numeric)
+                    table.setItem(i, 3, SortableTableItem(
+                        result['win_rate'], 
+                        f"{result['win_rate']:.1f}%"
+                    ))
+                    
+                    # Profit Factor (numeric)
+                    table.setItem(i, 4, SortableTableItem(
+                        result['profit_factor'], 
+                        f"{result['profit_factor']:.2f}"
+                    ))
+                    
+                    # Max Drawdown (numeric)
+                    table.setItem(i, 5, SortableTableItem(
+                        result['max_drawdown'], 
+                        f"{result['max_drawdown']:.1f}%"
+                    ))
+                    
+                    # Avg Trade (numeric)
+                    table.setItem(i, 6, SortableTableItem(
+                        result['avg_trade'], 
+                        f"${result['avg_trade']:.2f}"
+                    ))
+                    
+                # Enable sorting
+                table.setSortingEnabled(True)
+                self.setup_table_sorting(table)
+                
                 self.tabs.addTab(table, symbol)
             except Exception as e:
                 QMessageBox.warning(self, "Error", f"Error processing {symbol}: {str(e)}") 
@@ -380,51 +403,59 @@ class MainWindow(QMainWindow):
         summary_table.setRowCount(len(aggregated_results))
         for i, (strategy_name, results) in enumerate(aggregated_results.items()):
             # Strategy name
-            summary_table.setItem(i, 0, QTableWidgetItem(strategy_name))
+            summary_table.setItem(i, 0, SortableTableItem(strategy_name))
             
             # Net Profit
-            net_profit_item = QTableWidgetItem(f"${results['net_profit']:,.2f}")
+            net_profit_item = SortableTableItem(
+                results['net_profit'],
+                f"${results['net_profit']:,.2f}"
+            )
             net_profit_item.setTextAlignment(Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter)
             summary_table.setItem(i, 1, net_profit_item)
             
             # Total Trades
-            summary_table.setItem(i, 2, QTableWidgetItem(str(results['total_trades'])))
+            summary_table.setItem(i, 2, SortableTableItem(
+                results['total_trades'],
+                str(results['total_trades'])
+            ))
             
             # Win Rate
             if results['total_trades'] > 0:
                 win_rate = (results['winning_trades'] / results['total_trades']) * 100
-                win_rate_item = QTableWidgetItem(f"{win_rate:.1f}%")
+                win_rate_item = SortableTableItem(win_rate, f"{win_rate:.1f}%")
             else:
                 win_rate_item = SortableTableItem(0, "N/A")
             summary_table.setItem(i, 3, win_rate_item)
             
             # Profit Factor
-            profit_factor_item = QTableWidgetItem(f"{results['profit_factor']:.2f}")
-            summary_table.setItem(i, 4, profit_factor_item)
+            summary_table.setItem(i, 4, SortableTableItem(
+                results['profit_factor'],
+                f"{results['profit_factor']:.2f}"
+            ))
             
             # Max Drawdown
-            max_dd_item = QTableWidgetItem(f"{results['max_drawdown']:.1f}%")
-            summary_table.setItem(i, 5, max_dd_item)
+            summary_table.setItem(i, 5, SortableTableItem(
+                results['max_drawdown'],
+                f"{results['max_drawdown']:.1f}%"
+            ))
             
             # Number of symbols tested
-            summary_table.setItem(i, 6, QTableWidgetItem(str(results['total_symbols'])))
+            summary_table.setItem(i, 6, SortableTableItem(
+                results['total_symbols'],
+                str(results['total_symbols'])
+            ))
             
             # List of symbols
-            symbols_item = QTableWidgetItem(", ".join(results['symbols']))
-            symbols_item.setToolTip(", ".join(results['symbols']))  # Show full list on hover
-            summary_table.setItem(i, 7, symbols_item)
+            summary_table.setItem(i, 7, SortableTableItem(
+                len(results['symbols']),
+                ", ".join(results['symbols'])
+            ))
             
             # Color coding based on performance
             if results['net_profit'] > 0:
                 net_profit_item.setBackground(Qt.GlobalColor.green)
             else:
                 net_profit_item.setBackground(Qt.GlobalColor.red)
-        
-        # Enable sorting on the summary table
-        summary_table.setSortingEnabled(True)
-        
-        # Connect the header click to the custom handler
-        summary_table.horizontalHeader().sectionClicked.connect(lambda section, tbl=summary_table: self.handle_header_click(section, tbl))
         
         # Auto-adjust column widths
         summary_table.resizeColumnsToContents()
@@ -557,6 +588,35 @@ class MainWindow(QMainWindow):
             PositionSizingMethod.DOLLAR_AMOUNT.value: "Fixed dollar amount per trade"
         }
         self.position_size.setToolTip(tooltips.get(method_text, ""))
+
+    def setup_table_sorting(self, table):
+        """Set up sorting for table columns"""
+        header = table.horizontalHeader()
+        header.sectionClicked.connect(lambda index: self.sort_table(table, index))
+        
+    def sort_table(self, table, column_index):
+        """Sort table by clicked column"""
+        # Get current sort order
+        header = table.horizontalHeader()
+        current_order = header.sortIndicatorOrder()
+        
+        # Toggle sort order
+        new_order = (Qt.SortOrder.DescendingOrder 
+                    if current_order == Qt.SortOrder.AscendingOrder 
+                    else Qt.SortOrder.AscendingOrder)
+        
+        # Sort table
+        table.sortItems(column_index, new_order)
+
+class SortableTableItem(QTableWidgetItem):
+    def __init__(self, value, display_text=None):
+        super().__init__(display_text if display_text is not None else str(value))
+        self.value = value
+        
+    def __lt__(self, other):
+        if isinstance(self.value, (int, float)) and isinstance(other.value, (int, float)):
+            return self.value < other.value
+        return super().__lt__(other)
 
 class TradeDetailsDialog(QDialog):
     def __init__(self, trades, price_data):

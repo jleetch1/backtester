@@ -14,16 +14,6 @@ import matplotlib.pyplot as plt
 import pandas as pd
 from strategies.base_strategy import PositionSizingMethod
 
-class NumberTableWidgetItem(QTableWidgetItem):
-    def __init__(self, value):
-        super().__init__(str(value))
-        self.value = value
-
-    def __lt__(self, other):
-        if isinstance(other, NumberTableWidgetItem):
-            return self.value < other.value
-        return super().__lt__(other)
-
 class MainWindow(QMainWindow):
     STOCK_TIMEFRAME_LIMITS = {
         '1m': 7,
@@ -67,8 +57,6 @@ class MainWindow(QMainWindow):
         self.backtest_engine = BacktestEngine(self.initial_capital.value())
         
         self.load_strategies()
-        
-        self.sort_order_state = {}  # Add this to track sort orders
         
     def init_ui(self):
         central_widget = QWidget()
@@ -354,6 +342,10 @@ class MainWindow(QMainWindow):
                     table.setItem(i, 5, QTableWidgetItem(f"{result['max_drawdown']:.1f}%"))
                     table.setItem(i, 6, QTableWidgetItem(f"${result['avg_trade']:.2f}"))
                     
+                # Enable sorting
+                table.setSortingEnabled(True)
+                self.setup_table_sorting(table)
+                
                 self.tabs.addTab(table, symbol)
             except Exception as e:
                 QMessageBox.warning(self, "Error", f"Error processing {symbol}: {str(e)}") 
@@ -395,7 +387,7 @@ class MainWindow(QMainWindow):
                 win_rate = (results['winning_trades'] / results['total_trades']) * 100
                 win_rate_item = QTableWidgetItem(f"{win_rate:.1f}%")
             else:
-                win_rate_item = SortableTableItem(0, "N/A")
+                win_rate_item = QTableWidgetItem("N/A")
             summary_table.setItem(i, 3, win_rate_item)
             
             # Profit Factor
@@ -419,12 +411,6 @@ class MainWindow(QMainWindow):
                 net_profit_item.setBackground(Qt.GlobalColor.green)
             else:
                 net_profit_item.setBackground(Qt.GlobalColor.red)
-        
-        # Enable sorting on the summary table
-        summary_table.setSortingEnabled(True)
-        
-        # Connect the header click to the custom handler
-        summary_table.horizontalHeader().sectionClicked.connect(lambda section, tbl=summary_table: self.handle_header_click(section, tbl))
         
         # Auto-adjust column widths
         summary_table.resizeColumnsToContents()
@@ -557,6 +543,25 @@ class MainWindow(QMainWindow):
             PositionSizingMethod.DOLLAR_AMOUNT.value: "Fixed dollar amount per trade"
         }
         self.position_size.setToolTip(tooltips.get(method_text, ""))
+
+    def setup_table_sorting(self, table):
+        """Set up sorting for table columns"""
+        header = table.horizontalHeader()
+        header.sectionClicked.connect(lambda index: self.sort_table(table, index))
+        
+    def sort_table(self, table, column_index):
+        """Sort table by clicked column"""
+        # Get current sort order
+        header = table.horizontalHeader()
+        current_order = header.sortIndicatorOrder()
+        
+        # Toggle sort order
+        new_order = (Qt.SortOrder.DescendingOrder 
+                    if current_order == Qt.SortOrder.AscendingOrder 
+                    else Qt.SortOrder.AscendingOrder)
+        
+        # Sort table
+        table.sortItems(column_index, new_order)
 
 class TradeDetailsDialog(QDialog):
     def __init__(self, trades, price_data):
