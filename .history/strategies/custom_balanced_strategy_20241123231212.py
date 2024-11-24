@@ -8,9 +8,9 @@ class CustomBalancedStrategy(BaseStrategy):
     
     A robust strategy combining multiple technical indicators and advanced risk management:
     - Uses Moving Averages and RSI for trend identification
-    - Confirms signals with Stochastic and Volume analysis
+    - Confirms signals with Stochastic, MFI, and Volume analysis
     - Implements ATR-based dynamic position sizing and stops
-    - Features smart profit taking and trailing stops
+    - Features scaled exits and maximum hold time limits
     
     Parameters:
     - Short MA Period: {} days (fast moving average)
@@ -22,12 +22,14 @@ class CustomBalancedStrategy(BaseStrategy):
     - RSI Oversold: {} (buy threshold)
     - ATR Multiplier: {} (for stops)
     - Volume Threshold: {}x (volume confirmation)
+    - Max Hold Days: {} (maximum position duration)
     """
     
-    def __init__(self, initial_capital: float, short_ma: int = 20, long_ma: int = 50,
+    def __init__(self, initial_capital: float, short_ma: int = 10, long_ma: int = 30,
                  rsi_period: int = 14, stoch_period: int = 14, atr_period: int = 14,
                  rsi_overbought: float = 70, rsi_oversold: float = 30,
-                 atr_multiplier: float = 2.0, volume_threshold: float = 1.5):
+                 atr_multiplier: float = 1.5, volume_threshold: float = 2.0,
+                 max_hold_days: int = 20):
         super().__init__(initial_capital)
         self.short_ma = short_ma
         self.long_ma = long_ma
@@ -38,16 +40,21 @@ class CustomBalancedStrategy(BaseStrategy):
         self.rsi_oversold = rsi_oversold
         self.atr_multiplier = atr_multiplier
         self.volume_threshold = volume_threshold
+        self.max_hold_days = max_hold_days
         
         # Trading state variables
         self.entry_price = 0.0
+        self.entry_date = None
         self.stop_loss = 0.0
-        self.take_profit = 0.0
+        self.take_profit_1 = 0.0  # First target (50% position)
+        self.take_profit_2 = 0.0  # Second target (remaining position)
         self.trailing_stop = 0.0
+        self.position_scale = 1.0  # For tracking partial exits
         
         self.description = self.description.format(
             short_ma, long_ma, rsi_period, stoch_period, atr_period,
-            rsi_overbought, rsi_oversold, atr_multiplier, volume_threshold
+            rsi_overbought, rsi_oversold, atr_multiplier, volume_threshold,
+            max_hold_days
         )
 
     def generate_signals(self, data: pd.DataFrame) -> pd.DataFrame:
@@ -66,13 +73,19 @@ class CustomBalancedStrategy(BaseStrategy):
         df['Stoch_K'] = stoch.stoch()
         df['Stoch_D'] = stoch.stoch_signal()
         
-        # Calculate ATR for volatility-based position sizing
+        # Calculate MFI for volume-price confirmation
+        df['MFI'] = ta.volume.MFIIndicator(
+            high=df['High'], low=df['Low'],
+            close=df['Close'], volume=df['Volume'],
+            window=self.rsi_period
+        ).money_flow_index()
+        
+        # Calculate ATR and Volume metrics
         df['ATR'] = ta.volatility.AverageTrueRange(
             high=df['High'], low=df['Low'], close=df['Close'],
             window=self.atr_period
         ).average_true_range()
         
-        # Volume analysis
         df['Volume_MA'] = df['Volume'].rolling(window=self.short_ma).mean()
         df['Volume_Ratio'] = df['Volume'] / df['Volume_MA']
         
@@ -85,74 +98,94 @@ class CustomBalancedStrategy(BaseStrategy):
                 # Determine trend strength
                 trend_strength = abs(row['MA_short'] - row['MA_long']) / row['ATR']
                 
-                # Buy conditions
+                # Enhanced buy conditions
                 buy_condition = (
-                    (row['MA_short'] > row['MA_long']) and  # Uptrend
-                    (row['RSI'] < self.rsi_oversold) and    # RSI oversold
-                    (row['Stoch_K'] < 20) and               # Stochastic confirms
+                    (row['MA_short'] > row['MA_long']) and          # Uptrend
+                    (row['RSI'] < self.rsi_oversold) and           # RSI oversold
+                    (row['Stoch_K'] < 20) and                      # Stochastic confirms
+                    (row['MFI'] < 30) and                          # MFI confirms
                     (row['Volume_Ratio'] > self.volume_threshold) and  # Volume confirms
-                    (trend_strength > 1.0)                   # Strong trend
+                    (trend_strength > 1.5)                         # Strong trend
                 )
                 
-                # Sell conditions
+                # Enhanced sell conditions
                 sell_condition = (
-                    (row['MA_short'] < row['MA_long']) and  # Downtrend
-                    (row['RSI'] > self.rsi_overbought) and  # RSI overbought
-                    (row['Stoch_K'] > 80) and               # Stochastic confirms
+                    (row['MA_short'] < row['MA_long']) and          # Downtrend
+                    (row['RSI'] > self.rsi_overbought) and         # RSI overbought
+                    (row['Stoch_K'] > 80) and                      # Stochastic confirms
+                    (row['MFI'] > 70) and                          # MFI confirms
                     (row['Volume_Ratio'] > self.volume_threshold) and  # Volume confirms
-                    (trend_strength > 1.0)                   # Strong trend
+                    (trend_strength > 1.5)                         # Strong trend
                 )
                 
                 if buy_condition:
-                    # Calculate position size based on ATR
+                    # Calculate position size (1% risk per trade)
                     risk_per_share = row['ATR'] * self.atr_multiplier
                     position_size = min(
                         self.get_position_size(row['Close']),
-                        (self.capital * 0.02) / risk_per_share  # Risk 2% per trade
+                        (self.capital * 0.01) / risk_per_share
                     )
                     
                     self.position = position_size
                     self.entry_price = row['Close']
+                    self.entry_date = idx
                     self.stop_loss = self.entry_price - (risk_per_share * 1.5)
-                    self.take_profit = self.entry_price + (risk_per_share * 2.5)
+                    self.take_profit_1 = self.entry_price + (risk_per_share * 1.5)
+                    self.take_profit_2 = self.entry_price + (risk_per_share * 2.5)
                     self.trailing_stop = self.stop_loss
                     
                     df.at[idx, 'Signal'] = 1
                     df.at[idx, 'Position_Size'] = position_size
                 
                 elif sell_condition:
-                    # Similar position sizing for short positions
+                    # Similar setup for short positions
                     risk_per_share = row['ATR'] * self.atr_multiplier
                     position_size = min(
                         self.get_position_size(row['Close']),
-                        (self.capital * 0.02) / risk_per_share
+                        (self.capital * 0.01) / risk_per_share
                     )
                     
                     self.position = -position_size
                     self.entry_price = row['Close']
+                    self.entry_date = idx
                     self.stop_loss = self.entry_price + (risk_per_share * 1.5)
-                    self.take_profit = self.entry_price - (risk_per_share * 2.5)
+                    self.take_profit_1 = self.entry_price - (risk_per_share * 1.5)
+                    self.take_profit_2 = self.entry_price - (risk_per_share * 2.5)
                     self.trailing_stop = self.stop_loss
                     
                     df.at[idx, 'Signal'] = -1
                     df.at[idx, 'Position_Size'] = -position_size
             
             else:
+                # Check maximum hold time
+                days_held = (idx - self.entry_date).days
+                if days_held >= self.max_hold_days:
+                    df.at[idx, 'Signal'] = -np.sign(self.position)  # Exit signal
+                    self._reset_trade_vars()
+                    continue
+                
                 if self.position > 0:  # Long position management
                     # Update trailing stop
                     new_stop = row['Close'] - (row['ATR'] * self.atr_multiplier)
                     if new_stop > self.trailing_stop:
                         self.trailing_stop = new_stop
                     
-                    # Exit conditions
+                    # Scaled exit conditions
+                    if self.position_scale == 1.0 and row['High'] >= self.take_profit_1:
+                        # Exit half position at first target
+                        self.position *= 0.5
+                        self.position_scale = 0.5
+                        df.at[idx, 'Signal'] = -0.5
+                    
+                    # Full exit conditions
                     exit_long = (
                         (row['Low'] <= self.trailing_stop) or          # Stop hit
-                        (row['High'] >= self.take_profit) or           # Take profit hit
+                        (row['High'] >= self.take_profit_2) or         # Final target hit
                         (row['RSI'] > 80 and row['Stoch_K'] > 90)     # Extreme overbought
                     )
                     
                     if exit_long:
-                        df.at[idx, 'Signal'] = -1
+                        df.at[idx, 'Signal'] = -self.position_scale
                         self._reset_trade_vars()
                 
                 elif self.position < 0:  # Short position management
@@ -161,15 +194,22 @@ class CustomBalancedStrategy(BaseStrategy):
                     if new_stop < self.trailing_stop:
                         self.trailing_stop = new_stop
                     
-                    # Exit conditions
+                    # Scaled exit conditions
+                    if self.position_scale == 1.0 and row['Low'] <= self.take_profit_1:
+                        # Exit half position at first target
+                        self.position *= 0.5
+                        self.position_scale = 0.5
+                        df.at[idx, 'Signal'] = 0.5
+                    
+                    # Full exit conditions
                     exit_short = (
                         (row['High'] >= self.trailing_stop) or        # Stop hit
-                        (row['Low'] <= self.take_profit) or           # Take profit hit
+                        (row['Low'] <= self.take_profit_2) or         # Final target hit
                         (row['RSI'] < 20 and row['Stoch_K'] < 10)    # Extreme oversold
                     )
                     
                     if exit_short:
-                        df.at[idx, 'Signal'] = 1
+                        df.at[idx, 'Signal'] = abs(self.position_scale)
                         self._reset_trade_vars()
         
         return df
@@ -178,6 +218,9 @@ class CustomBalancedStrategy(BaseStrategy):
         """Reset all trade-related variables"""
         self.position = 0
         self.entry_price = 0.0
+        self.entry_date = None
         self.stop_loss = 0.0
-        self.take_profit = 0.0
+        self.take_profit_1 = 0.0
+        self.take_profit_2 = 0.0
         self.trailing_stop = 0.0
+        self.position_scale = 1.0

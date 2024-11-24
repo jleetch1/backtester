@@ -1,5 +1,5 @@
 {
-    "Report Generated": "2024-11-23 22:59:09",
+    "Report Generated": "2024-11-23 23:13:57",
     "Strategies": {
         "CustomBalancedStrategy": {
             "Strategy Overview": {
@@ -11,22 +11,22 @@
             },
             "Summary Performance": {
                 "Overall Statistics": {
-                    "Total Net Profit": 112009.06711816788,
-                    "Total Number of Trades": 46,
-                    "Overall Win Rate": 52.806122448979586,
-                    "Average Trade": 3136.6317863285944,
-                    "Profit Factor": 2.2533916360840474,
-                    "Maximum Drawdown": 44.65849609375
+                    "Total Net Profit": 95722.04953432083,
+                    "Total Number of Trades": 13,
+                    "Overall Win Rate": 33.33333333333333,
+                    "Average Trade": 6338.269846439362,
+                    "Profit Factor": 13.632380276820294,
+                    "Maximum Drawdown": 3.66190185546875
                 },
                 "Return Metrics": {
-                    "Total Return": 16.001295302595413,
-                    "Annualized Return": 23.80913530807573,
+                    "Total Return": 19.144409906864173,
+                    "Annualized Return": 114.48995839927173,
                     "CAGR": 0,
                     "Monthly Returns": {}
                 },
                 "Risk Metrics": {
-                    "Volatility": 324.82656195822517,
-                    "Sharpe Ratio": 4.007462226767466,
+                    "Volatility": NaN,
+                    "Sharpe Ratio": NaN,
                     "Sortino Ratio": NaN,
                     "Calmar Ratio": 0,
                     "Value at Risk (95%)": 0,
@@ -37,17 +37,15 @@
                     "Average Loss": 0,
                     "Largest Win": 0,
                     "Largest Loss": 0,
-                    "Average Trade Duration": 21.59166666666667,
+                    "Average Trade Duration": 99.6,
                     "Profit Distribution": {}
                 },
                 "Market Environment Performance": {},
                 "Symbols Overview": {
-                    "Number of Symbols Traded": 7,
+                    "Number of Symbols Traded": 5,
                     "Symbols List": [
                         "BKNG",
                         "BLNK",
-                        "CAT",
-                        "BMY",
                         "COST",
                         "CRM",
                         "CSCO"
@@ -73,100 +71,78 @@
                 "BKNG": {
                     "Trades": [
                         {
-                            "Entry Date": "2024-02-23 09:30:00",
-                            "Entry Price": 3543.070068359375,
+                            "Entry Date": "2024-07-18 10:30:00",
+                            "Entry Price": 3921.429931640625,
                             "Position Size": 100.0,
-                            "Exit Date": "2024-03-06 13:30:00",
-                            "Exit Price": 3407.1201171875,
-                            "Profit/Loss": -13594.9951171875,
-                            "Return %": -3.8370664014225064,
-                            "Hold Time (Days)": 12,
+                            "Exit Date": "2024-07-22 14:30:00",
+                            "Exit Price": 3919.280029296875,
+                            "Profit/Loss": -214.990234375,
+                            "Return %": -0.05482444876556691,
+                            "Hold Time (Days)": 4,
                             "Trade Type": "Long"
                         },
                         {
-                            "Entry Date": "2024-04-01 11:30:00",
-                            "Entry Price": 3556.0,
+                            "Entry Date": "2024-10-01 09:30:00",
+                            "Entry Price": 4095.02490234375,
                             "Position Size": 100.0,
-                            "Exit Date": "2024-04-16 09:30:00",
-                            "Exit Price": 3459.5849609375,
-                            "Profit/Loss": -9641.50390625,
-                            "Return %": -2.7113340568757027,
-                            "Hold Time (Days)": 14,
+                            "Exit Date": "2024-10-03 09:30:00",
+                            "Exit Price": 4081.070068359375,
+                            "Profit/Loss": -1395.4833984375,
+                            "Return %": -0.3407753143671477,
+                            "Hold Time (Days)": 2,
                             "Trade Type": "Long"
                         },
                         {
-                            "Entry Date": "2024-07-01 09:30:00",
-                            "Entry Price": 3914.429931640625,
-                            "Position Size": 100.0,
-                            "Exit Date": "2024-07-18 10:30:00",
-                            "Exit Price": 3921.429931640625,
-                            "Profit/Loss": 700.0,
-                            "Return %": 0.17882552816741448,
-                            "Hold Time (Days)": 17,
-                            "Trade Type": "Long"
-                        },
-                        {
-                            "Entry Date": "2024-07-18 11:30:00",
-                            "Entry Price": 3921.6298828125,
-                            "Position Size": 100.0,
-                            "Exit Date": "2024-07-25 09:30:00",
-                            "Exit Price": 3700.409912109375,
-                            "Profit/Loss": -22121.9970703125,
-                            "Return %": -5.641021139518432,
-                            "Hold Time (Days)": 6,
-                            "Trade Type": "Long"
-                        },
-                        {
-                            "Entry Date": "2024-09-04 09:30:00",
-                            "Entry Price": 3786.469970703125,
+                            "Entry Date": "2024-10-08 09:30:00",
+                            "Entry Price": 4221.0,
                             "Position Size": 100.0,
                             "Exit Date": "2024-11-22 15:30:00",
                             "Exit Price": 5174.16015625,
-                            "Profit/Loss": 138769.0185546875,
-                            "Return %": 36.648651548375774,
-                            "Hold Time (Days)": 79,
+                            "Profit/Loss": 95316.015625,
+                            "Return %": 22.58138252191424,
+                            "Hold Time (Days)": 45,
                             "Trade Type": "Long"
                         }
                     ],
                     "Symbol Statistics": {
                         "Trade Summary": {
-                            "Total Trades": 5,
-                            "Winning Trades": 2,
-                            "Losing Trades": 3,
-                            "Win Rate %": 40.0
+                            "Total Trades": 3,
+                            "Winning Trades": 1,
+                            "Losing Trades": 2,
+                            "Win Rate %": 33.33333333333333
                         },
                         "Profit Metrics": {
-                            "Total Profit": 139469.0185546875,
-                            "Total Loss": 45358.49609375,
-                            "Net Profit": 94110.5224609375,
-                            "Profit Factor": 3.0748157581420585,
-                            "Average Win": 69734.50927734375,
-                            "Average Loss": 15119.498697916666,
-                            "Largest Win": 138769.0185546875,
-                            "Largest Loss": -22121.9970703125
+                            "Total Profit": 95316.015625,
+                            "Total Loss": 1610.4736328125,
+                            "Net Profit": 93705.5419921875,
+                            "Profit Factor": 59.18508299855984,
+                            "Average Win": 95316.015625,
+                            "Average Loss": 805.23681640625,
+                            "Largest Win": 95316.015625,
+                            "Largest Loss": -1395.4833984375
                         },
                         "Trade Timing": {
-                            "Average Hold Time (Days)": 25.6,
-                            "Shortest Trade (Days)": 6.0,
-                            "Longest Trade (Days)": 79.0
+                            "Average Hold Time (Days)": 17.0,
+                            "Shortest Trade (Days)": 2.0,
+                            "Longest Trade (Days)": 45.0
                         },
                         "Risk Metrics": {
-                            "Max Drawdown %": 44.65849609375,
-                            "Risk-Reward Ratio": 4.612223637213088,
-                            "Average Risk per Trade": 36965.5029296875
+                            "Max Drawdown %": 1.6104736328125,
+                            "Risk-Reward Ratio": 118.37016599711968,
+                            "Average Risk per Trade": 32308.829752604168
                         },
                         "Market Analysis": {
                             "Correlation with Market": NaN,
                             "Performance in Different Market Conditions": {
                                 "Uptrend": {
-                                    "Number of Trades": 4,
-                                    "Win Rate": 25.0,
-                                    "Average Profit": 23352.630615234375
+                                    "Number of Trades": 3,
+                                    "Win Rate": 33.33333333333333,
+                                    "Average Profit": 31235.1806640625
                                 },
                                 "Downtrend": {
-                                    "Number of Trades": 1,
-                                    "Win Rate": 100.0,
-                                    "Average Profit": 700.0
+                                    "Number of Trades": 0,
+                                    "Win Rate": 0,
+                                    "Average Profit": 0
                                 },
                                 "Sideways": {
                                     "Number of Trades": 0,
@@ -187,155 +163,56 @@
                 "BLNK": {
                     "Trades": [
                         {
-                            "Entry Date": "2024-01-05 10:30:00",
-                            "Entry Price": 2.799999952316284,
+                            "Entry Date": "2024-01-23 09:30:00",
+                            "Entry Price": 2.569999933242798,
                             "Position Size": 100.0,
-                            "Exit Date": "2024-01-09 09:30:00",
-                            "Exit Price": 2.919600009918213,
-                            "Profit/Loss": 11.960005760192871,
-                            "Return %": 4.271430701382339,
-                            "Hold Time (Days)": 3,
-                            "Trade Type": "Long"
-                        },
-                        {
-                            "Entry Date": "2024-02-23 09:30:00",
-                            "Entry Price": 2.79010009765625,
-                            "Position Size": 100.0,
-                            "Exit Date": "2024-02-26 09:30:00",
-                            "Exit Price": 3.059999942779541,
-                            "Profit/Loss": 26.9899845123291,
-                            "Return %": 9.673482515914511,
-                            "Hold Time (Days)": 3,
-                            "Trade Type": "Long"
-                        },
-                        {
-                            "Entry Date": "2024-03-18 09:30:00",
-                            "Entry Price": 2.759999990463257,
-                            "Position Size": 100.0,
-                            "Exit Date": "2024-03-19 09:30:00",
-                            "Exit Price": 2.5680999755859375,
-                            "Profit/Loss": -19.190001487731934,
-                            "Return %": -6.952899113782585,
-                            "Hold Time (Days)": 1,
-                            "Trade Type": "Long"
-                        },
-                        {
-                            "Entry Date": "2024-03-19 10:30:00",
-                            "Entry Price": 2.559999942779541,
-                            "Position Size": 100.0,
-                            "Exit Date": "2024-03-20 14:30:00",
-                            "Exit Price": 2.7688000202178955,
-                            "Profit/Loss": 20.88000774383545,
-                            "Return %": 8.15625320724218,
-                            "Hold Time (Days)": 1,
-                            "Trade Type": "Long"
-                        },
-                        {
-                            "Entry Date": "2024-05-21 11:30:00",
-                            "Entry Price": 3.0450000762939453,
-                            "Position Size": 100.0,
-                            "Exit Date": "2024-05-22 09:30:00",
-                            "Exit Price": 3.2750000953674316,
-                            "Profit/Loss": 23.000001907348633,
-                            "Return %": 7.55336661118966,
-                            "Hold Time (Days)": 0,
-                            "Trade Type": "Long"
-                        },
-                        {
-                            "Entry Date": "2024-06-17 09:30:00",
-                            "Entry Price": 2.8808999061584473,
-                            "Position Size": 100.0,
-                            "Exit Date": "2024-06-20 09:30:00",
-                            "Exit Price": 2.740000009536743,
-                            "Profit/Loss": -14.08998966217041,
-                            "Return %": -4.890829296793853,
-                            "Hold Time (Days)": 3,
-                            "Trade Type": "Long"
-                        },
-                        {
-                            "Entry Date": "2024-07-22 11:30:00",
-                            "Entry Price": 3.0199999809265137,
-                            "Position Size": 100.0,
-                            "Exit Date": "2024-07-24 15:30:00",
-                            "Exit Price": 3.180000066757202,
-                            "Profit/Loss": 16.000008583068848,
-                            "Return %": 5.298016120569704,
-                            "Hold Time (Days)": 2,
-                            "Trade Type": "Long"
-                        },
-                        {
-                            "Entry Date": "2024-08-02 09:30:00",
-                            "Entry Price": 2.8998000621795654,
-                            "Position Size": 100.0,
-                            "Exit Date": "2024-08-05 09:30:00",
-                            "Exit Price": 2.684999942779541,
-                            "Profit/Loss": -21.48001194000244,
-                            "Return %": -7.407411366098637,
-                            "Hold Time (Days)": 3,
-                            "Trade Type": "Long"
-                        },
-                        {
-                            "Entry Date": "2024-08-05 14:30:00",
-                            "Entry Price": 2.7249999046325684,
-                            "Position Size": 100.0,
-                            "Exit Date": "2024-08-07 13:30:00",
-                            "Exit Price": 2.615000009536743,
-                            "Profit/Loss": -10.99998950958252,
-                            "Return %": -4.036693539284997,
-                            "Hold Time (Days)": 1,
-                            "Trade Type": "Long"
-                        },
-                        {
-                            "Entry Date": "2024-11-08 09:30:00",
-                            "Entry Price": 1.6050000190734863,
-                            "Position Size": 100.0,
-                            "Exit Date": "2024-11-11 10:30:00",
-                            "Exit Price": 1.840000033378601,
-                            "Profit/Loss": 23.500001430511475,
-                            "Return %": 14.64174526557156,
-                            "Hold Time (Days)": 3,
+                            "Exit Date": "2024-11-22 15:30:00",
+                            "Exit Price": 1.524999976158142,
+                            "Profit/Loss": -104.49999570846558,
+                            "Return %": -40.66147798556891,
+                            "Hold Time (Days)": 304,
                             "Trade Type": "Long"
                         }
                     ],
                     "Symbol Statistics": {
                         "Trade Summary": {
-                            "Total Trades": 10,
-                            "Winning Trades": 6,
-                            "Losing Trades": 4,
-                            "Win Rate %": 60.0
+                            "Total Trades": 1,
+                            "Winning Trades": 0,
+                            "Losing Trades": 1,
+                            "Win Rate %": 0.0
                         },
                         "Profit Metrics": {
-                            "Total Profit": 122.33000993728638,
-                            "Total Loss": 65.7599925994873,
-                            "Net Profit": 56.57001733779907,
-                            "Profit Factor": 1.8602497521911237,
-                            "Average Win": 20.38833498954773,
-                            "Average Loss": 16.439998149871826,
-                            "Largest Win": 26.9899845123291,
-                            "Largest Loss": -21.48001194000244
+                            "Total Profit": 0.0,
+                            "Total Loss": 104.49999570846558,
+                            "Net Profit": -104.49999570846558,
+                            "Profit Factor": 0.0,
+                            "Average Win": 0,
+                            "Average Loss": 104.49999570846558,
+                            "Largest Win": 0.0,
+                            "Largest Loss": -104.49999570846558
                         },
                         "Trade Timing": {
-                            "Average Hold Time (Days)": 2.0,
-                            "Shortest Trade (Days)": 0.0,
-                            "Longest Trade (Days)": 3.0
+                            "Average Hold Time (Days)": 304.0,
+                            "Shortest Trade (Days)": 304.0,
+                            "Longest Trade (Days)": 304.0
                         },
                         "Risk Metrics": {
-                            "Max Drawdown %": 0.0324587247498776,
-                            "Risk-Reward Ratio": 1.240166501460749,
-                            "Average Risk per Trade": 18.809000253677368
+                            "Max Drawdown %": 0.10449999570846556,
+                            "Risk-Reward Ratio": 0,
+                            "Average Risk per Trade": 104.49999570846558
                         },
                         "Market Analysis": {
-                            "Correlation with Market": NaN,
+                            "Correlation with Market": 0,
                             "Performance in Different Market Conditions": {
                                 "Uptrend": {
-                                    "Number of Trades": 3,
-                                    "Win Rate": 33.33333333333333,
-                                    "Average Profit": -3.426663080851237
+                                    "Number of Trades": 0,
+                                    "Win Rate": 0,
+                                    "Average Profit": 0
                                 },
                                 "Downtrend": {
-                                    "Number of Trades": 7,
-                                    "Win Rate": 71.42857142857143,
-                                    "Average Profit": 9.550000940050397
+                                    "Number of Trades": 1,
+                                    "Win Rate": 0.0,
+                                    "Average Profit": -104.49999570846558
                                 },
                                 "Sideways": {
                                     "Number of Trades": 0,
@@ -353,311 +230,50 @@
                         "Price Change %": -57.57997318437622
                     }
                 },
-                "CAT": {
-                    "Trades": [
-                        {
-                            "Entry Date": "2024-01-17 09:30:00",
-                            "Entry Price": 281.2200012207031,
-                            "Position Size": 100.0,
-                            "Exit Date": "2024-04-16 09:30:00",
-                            "Exit Price": 358.82000732421875,
-                            "Profit/Loss": 7760.0006103515625,
-                            "Return %": 27.59405652751372,
-                            "Hold Time (Days)": 89,
-                            "Trade Type": "Long"
-                        },
-                        {
-                            "Entry Date": "2024-05-29 09:30:00",
-                            "Entry Price": 341.3800048828125,
-                            "Position Size": 100.0,
-                            "Exit Date": "2024-06-03 11:30:00",
-                            "Exit Price": 327.0400085449219,
-                            "Profit/Loss": -1433.9996337890625,
-                            "Return %": -4.200596441731608,
-                            "Hold Time (Days)": 5,
-                            "Trade Type": "Long"
-                        },
-                        {
-                            "Entry Date": "2024-07-24 15:30:00",
-                            "Entry Price": 336.010009765625,
-                            "Position Size": 100.0,
-                            "Exit Date": "2024-08-01 10:30:00",
-                            "Exit Price": 333.4100036621094,
-                            "Profit/Loss": -260.0006103515625,
-                            "Return %": -0.7737882884290226,
-                            "Hold Time (Days)": 7,
-                            "Trade Type": "Long"
-                        },
-                        {
-                            "Entry Date": "2024-08-01 11:30:00",
-                            "Entry Price": 333.25,
-                            "Position Size": 100.0,
-                            "Exit Date": "2024-08-05 09:30:00",
-                            "Exit Price": 313.989990234375,
-                            "Profit/Loss": -1926.0009765625,
-                            "Return %": -5.7794477916354055,
-                            "Hold Time (Days)": 3,
-                            "Trade Type": "Long"
-                        },
-                        {
-                            "Entry Date": "2024-08-05 10:30:00",
-                            "Entry Price": 316.7799987792969,
-                            "Position Size": 100.0,
-                            "Exit Date": "2024-08-06 09:30:00",
-                            "Exit Price": 328.9742126464844,
-                            "Profit/Loss": 1219.42138671875,
-                            "Return %": 3.849426704393455,
-                            "Hold Time (Days)": 0,
-                            "Trade Type": "Long"
-                        },
-                        {
-                            "Entry Date": "2024-09-04 14:30:00",
-                            "Entry Price": 336.6700134277344,
-                            "Position Size": 100.0,
-                            "Exit Date": "2024-10-23 13:30:00",
-                            "Exit Price": 384.2099914550781,
-                            "Profit/Loss": 4753.997802734375,
-                            "Return %": 14.120645181115332,
-                            "Hold Time (Days)": 48,
-                            "Trade Type": "Long"
-                        }
-                    ],
-                    "Symbol Statistics": {
-                        "Trade Summary": {
-                            "Total Trades": 6,
-                            "Winning Trades": 3,
-                            "Losing Trades": 3,
-                            "Win Rate %": 50.0
-                        },
-                        "Profit Metrics": {
-                            "Total Profit": 13733.419799804688,
-                            "Total Loss": 3620.001220703125,
-                            "Net Profit": 10113.418579101562,
-                            "Profit Factor": 3.7937610963394093,
-                            "Average Win": 4577.8065999348955,
-                            "Average Loss": 1206.6670735677083,
-                            "Largest Win": 7760.0006103515625,
-                            "Largest Loss": -1926.0009765625
-                        },
-                        "Trade Timing": {
-                            "Average Hold Time (Days)": 25.333333333333332,
-                            "Shortest Trade (Days)": 0.0,
-                            "Longest Trade (Days)": 89.0
-                        },
-                        "Risk Metrics": {
-                            "Max Drawdown %": 3.359318114513246,
-                            "Risk-Reward Ratio": 3.7937610963394093,
-                            "Average Risk per Trade": 2892.2368367513022
-                        },
-                        "Market Analysis": {
-                            "Correlation with Market": NaN,
-                            "Performance in Different Market Conditions": {
-                                "Uptrend": {
-                                    "Number of Trades": 0,
-                                    "Win Rate": 0,
-                                    "Average Profit": 0
-                                },
-                                "Downtrend": {
-                                    "Number of Trades": 6,
-                                    "Win Rate": 50.0,
-                                    "Average Profit": 1685.5697631835938
-                                },
-                                "Sideways": {
-                                    "Number of Trades": 0,
-                                    "Win Rate": 0,
-                                    "Average Profit": 0
-                                }
-                            }
-                        }
-                    },
-                    "Price Data": {
-                        "Start Date": "2023-11-22",
-                        "End Date": "2024-11-22",
-                        "Initial Price": 243.63999938964844,
-                        "Final Price": 397.4599914550781,
-                        "Price Change %": 63.13412922786481
-                    }
-                },
-                "BMY": {
-                    "Trades": [
-                        {
-                            "Entry Date": "2024-01-10 10:30:00",
-                            "Entry Price": 50.72999954223633,
-                            "Position Size": 100.0,
-                            "Exit Date": "2024-02-01 09:30:00",
-                            "Exit Price": 48.42499923706055,
-                            "Profit/Loss": -230.50003051757812,
-                            "Return %": -4.5436631696728185,
-                            "Hold Time (Days)": 21,
-                            "Trade Type": "Long"
-                        },
-                        {
-                            "Entry Date": "2024-03-14 09:30:00",
-                            "Entry Price": 51.970001220703125,
-                            "Position Size": 100.0,
-                            "Exit Date": "2024-04-04 13:30:00",
-                            "Exit Price": 51.5,
-                            "Profit/Loss": -47.0001220703125,
-                            "Return %": -0.9043702321790414,
-                            "Hold Time (Days)": 21,
-                            "Trade Type": "Long"
-                        },
-                        {
-                            "Entry Date": "2024-04-04 14:30:00",
-                            "Entry Price": 51.27000045776367,
-                            "Position Size": 100.0,
-                            "Exit Date": "2024-04-12 09:30:00",
-                            "Exit Price": 48.845001220703125,
-                            "Profit/Loss": -242.4999237060547,
-                            "Return %": -4.729859987144458,
-                            "Hold Time (Days)": 7,
-                            "Trade Type": "Long"
-                        },
-                        {
-                            "Entry Date": "2024-07-03 10:30:00",
-                            "Entry Price": 40.16999816894531,
-                            "Position Size": 100.0,
-                            "Exit Date": "2024-07-19 10:30:00",
-                            "Exit Price": 41.935001373291016,
-                            "Profit/Loss": 176.5003204345703,
-                            "Return %": 4.393834415731179,
-                            "Hold Time (Days)": 16,
-                            "Trade Type": "Long"
-                        },
-                        {
-                            "Entry Date": "2024-08-22 09:30:00",
-                            "Entry Price": 47.404998779296875,
-                            "Position Size": 100.0,
-                            "Exit Date": "2024-09-09 09:30:00",
-                            "Exit Price": 48.82500076293945,
-                            "Profit/Loss": 142.0001983642578,
-                            "Return %": 2.9954688750308156,
-                            "Hold Time (Days)": 18,
-                            "Trade Type": "Long"
-                        },
-                        {
-                            "Entry Date": "2024-09-10 09:30:00",
-                            "Entry Price": 48.13999938964844,
-                            "Position Size": 100.0,
-                            "Exit Date": "2024-10-09 09:30:00",
-                            "Exit Price": 51.900001525878906,
-                            "Profit/Loss": 376.0002136230469,
-                            "Return %": 7.8105570916126466,
-                            "Hold Time (Days)": 29,
-                            "Trade Type": "Long"
-                        },
-                        {
-                            "Entry Date": "2024-11-15 14:30:00",
-                            "Entry Price": 55.96500015258789,
-                            "Position Size": 100.0,
-                            "Exit Date": "2024-11-22 15:30:00",
-                            "Exit Price": 58.86000061035156,
-                            "Profit/Loss": 289.5000457763672,
-                            "Return %": 5.172876708425789,
-                            "Hold Time (Days)": 7,
-                            "Trade Type": "Long"
-                        }
-                    ],
-                    "Symbol Statistics": {
-                        "Trade Summary": {
-                            "Total Trades": 7,
-                            "Winning Trades": 4,
-                            "Losing Trades": 3,
-                            "Win Rate %": 57.14285714285714
-                        },
-                        "Profit Metrics": {
-                            "Total Profit": 984.0007781982422,
-                            "Total Loss": 520.0000762939453,
-                            "Net Profit": 464.0007019042969,
-                            "Profit Factor": 1.8923089112048646,
-                            "Average Win": 246.00019454956055,
-                            "Average Loss": 173.33335876464844,
-                            "Largest Win": 376.0002136230469,
-                            "Largest Loss": -242.4999237060547
-                        },
-                        "Trade Timing": {
-                            "Average Hold Time (Days)": 17.0,
-                            "Shortest Trade (Days)": 7.0,
-                            "Longest Trade (Days)": 29.0
-                        },
-                        "Risk Metrics": {
-                            "Max Drawdown %": 0.5200000762939453,
-                            "Risk-Reward Ratio": 1.4192316834036485,
-                            "Average Risk per Trade": 214.85726492745536
-                        },
-                        "Market Analysis": {
-                            "Correlation with Market": NaN,
-                            "Performance in Different Market Conditions": {
-                                "Uptrend": {
-                                    "Number of Trades": 3,
-                                    "Win Rate": 66.66666666666666,
-                                    "Average Profit": 128.16670735677084
-                                },
-                                "Downtrend": {
-                                    "Number of Trades": 4,
-                                    "Win Rate": 50.0,
-                                    "Average Profit": 19.875144958496094
-                                },
-                                "Sideways": {
-                                    "Number of Trades": 0,
-                                    "Win Rate": 0,
-                                    "Average Profit": 0
-                                }
-                            }
-                        }
-                    },
-                    "Price Data": {
-                        "Start Date": "2023-11-22",
-                        "End Date": "2024-11-22",
-                        "Initial Price": 48.77000045776367,
-                        "Final Price": 58.86000061035156,
-                        "Price Change %": 20.688948242529026
-                    }
-                },
                 "COST": {
                     "Trades": [
                         {
                             "Entry Date": "2024-03-08 09:30:00",
                             "Entry Price": 740.97998046875,
                             "Position Size": 100.0,
-                            "Exit Date": "2024-04-02 09:30:00",
-                            "Exit Price": 714.4299926757812,
-                            "Profit/Loss": -2654.998779296875,
-                            "Return %": -3.5830911080989014,
-                            "Hold Time (Days)": 24,
+                            "Exit Date": "2024-03-11 09:30:00",
+                            "Exit Price": 712.39599609375,
+                            "Profit/Loss": -2858.3984375,
+                            "Return %": -3.8575919901260414,
+                            "Hold Time (Days)": 2,
                             "Trade Type": "Long"
                         },
                         {
-                            "Entry Date": "2024-05-31 09:30:00",
-                            "Entry Price": 791.47998046875,
+                            "Entry Date": "2024-06-21 15:30:00",
+                            "Entry Price": 847.6500244140625,
                             "Position Size": 100.0,
-                            "Exit Date": "2024-07-11 13:30:00",
-                            "Exit Price": 848.22998046875,
-                            "Profit/Loss": 5675.0,
-                            "Return %": 7.170111866429019,
-                            "Hold Time (Days)": 41,
+                            "Exit Date": "2024-06-27 10:30:00",
+                            "Exit Price": 850.0549926757812,
+                            "Profit/Loss": 240.496826171875,
+                            "Return %": 0.2837218418510812,
+                            "Hold Time (Days)": 5,
                             "Trade Type": "Long"
                         },
                         {
-                            "Entry Date": "2024-07-11 14:30:00",
-                            "Entry Price": 848.75,
+                            "Entry Date": "2024-07-11 09:30:00",
+                            "Entry Price": 852.1599731445312,
                             "Position Size": 100.0,
-                            "Exit Date": "2024-07-26 09:30:00",
-                            "Exit Price": 817.0499877929688,
-                            "Profit/Loss": -3170.001220703125,
-                            "Return %": -3.734905709223124,
-                            "Hold Time (Days)": 14,
+                            "Exit Date": "2024-07-12 09:30:00",
+                            "Exit Price": 841.719970703125,
+                            "Profit/Loss": -1044.000244140625,
+                            "Return %": -1.2251223679143108,
+                            "Hold Time (Days)": 1,
                             "Trade Type": "Long"
                         },
                         {
-                            "Entry Date": "2024-09-27 11:30:00",
-                            "Entry Price": 881.219970703125,
+                            "Entry Date": "2024-11-06 09:30:00",
+                            "Entry Price": 891.4998779296875,
                             "Position Size": 100.0,
-                            "Exit Date": "2024-11-15 09:30:00",
-                            "Exit Price": 918.0955200195312,
-                            "Profit/Loss": 3687.554931640625,
-                            "Return %": 4.184602090552181,
-                            "Hold Time (Days)": 48,
+                            "Exit Date": "2024-11-22 15:30:00",
+                            "Exit Price": 964.1389770507812,
+                            "Profit/Loss": 7263.909912109375,
+                            "Return %": 8.147965122528355,
+                            "Hold Time (Days)": 16,
                             "Trade Type": "Long"
                         }
                     ],
@@ -669,37 +285,37 @@
                             "Win Rate %": 50.0
                         },
                         "Profit Metrics": {
-                            "Total Profit": 9362.554931640625,
-                            "Total Loss": 5825.0,
-                            "Net Profit": 3537.554931640625,
-                            "Profit Factor": 1.6073055676636265,
-                            "Average Win": 4681.2774658203125,
-                            "Average Loss": 2912.5,
-                            "Largest Win": 5675.0,
-                            "Largest Loss": -3170.001220703125
+                            "Total Profit": 7504.40673828125,
+                            "Total Loss": 3902.398681640625,
+                            "Net Profit": 3602.008056640625,
+                            "Profit Factor": 1.9230241065800813,
+                            "Average Win": 3752.203369140625,
+                            "Average Loss": 1951.1993408203125,
+                            "Largest Win": 7263.909912109375,
+                            "Largest Loss": -2858.3984375
                         },
                         "Trade Timing": {
-                            "Average Hold Time (Days)": 31.75,
-                            "Shortest Trade (Days)": 14.0,
-                            "Longest Trade (Days)": 48.0
+                            "Average Hold Time (Days)": 6.0,
+                            "Shortest Trade (Days)": 1.0,
+                            "Longest Trade (Days)": 16.0
                         },
                         "Risk Metrics": {
-                            "Max Drawdown %": 3.077073561581433,
-                            "Risk-Reward Ratio": 1.6073055676636265,
-                            "Average Risk per Trade": 3796.8887329101562
+                            "Max Drawdown %": 3.66190185546875,
+                            "Risk-Reward Ratio": 1.9230241065800813,
+                            "Average Risk per Trade": 2851.7013549804688
                         },
                         "Market Analysis": {
                             "Correlation with Market": NaN,
                             "Performance in Different Market Conditions": {
                                 "Uptrend": {
-                                    "Number of Trades": 3,
-                                    "Win Rate": 33.33333333333333,
-                                    "Average Profit": -50.0
+                                    "Number of Trades": 4,
+                                    "Win Rate": 50.0,
+                                    "Average Profit": 900.5020141601562
                                 },
                                 "Downtrend": {
-                                    "Number of Trades": 1,
-                                    "Win Rate": 100.0,
-                                    "Average Profit": 3687.554931640625
+                                    "Number of Trades": 0,
+                                    "Win Rate": 0,
+                                    "Average Profit": 0
                                 },
                                 "Sideways": {
                                     "Number of Trades": 0,
@@ -720,133 +336,78 @@
                 "CRM": {
                     "Trades": [
                         {
-                            "Entry Date": "2024-02-13 09:30:00",
-                            "Entry Price": 282.1000061035156,
+                            "Entry Date": "2024-01-10 09:30:00",
+                            "Entry Price": 265.2300109863281,
                             "Position Size": 100.0,
-                            "Exit Date": "2024-03-05 10:30:00",
-                            "Exit Price": 303.5199890136719,
-                            "Profit/Loss": 2141.998291015625,
-                            "Return %": 7.593045886817973,
-                            "Hold Time (Days)": 21,
+                            "Exit Date": "2024-06-20 09:30:00",
+                            "Exit Price": 238.5500030517578,
+                            "Profit/Loss": -2668.0007934570312,
+                            "Return %": -10.059196482084975,
+                            "Hold Time (Days)": 161,
                             "Trade Type": "Long"
                         },
                         {
-                            "Entry Date": "2024-03-15 10:30:00",
-                            "Entry Price": 297.2900085449219,
+                            "Entry Date": "2024-06-21 09:30:00",
+                            "Entry Price": 244.55999755859375,
                             "Position Size": 100.0,
-                            "Exit Date": "2024-04-02 09:30:00",
-                            "Exit Price": 298.8349914550781,
-                            "Profit/Loss": 154.498291015625,
-                            "Return %": 0.5196888108410125,
-                            "Hold Time (Days)": 17,
+                            "Exit Date": "2024-07-10 09:30:00",
+                            "Exit Price": 247.1999969482422,
+                            "Profit/Loss": 263.99993896484375,
+                            "Return %": 1.0794894569852609,
+                            "Hold Time (Days)": 19,
                             "Trade Type": "Long"
                         },
                         {
-                            "Entry Date": "2024-05-24 09:30:00",
-                            "Entry Price": 271.4549865722656,
-                            "Position Size": 100.0,
-                            "Exit Date": "2024-05-30 09:30:00",
-                            "Exit Price": 218.75999450683594,
-                            "Profit/Loss": -5269.499206542969,
-                            "Return %": -19.41205528431191,
-                            "Hold Time (Days)": 6,
-                            "Trade Type": "Long"
-                        },
-                        {
-                            "Entry Date": "2024-07-09 09:30:00",
-                            "Entry Price": 251.97000122070312,
-                            "Position Size": 100.0,
-                            "Exit Date": "2024-08-01 13:30:00",
-                            "Exit Price": 250.63999938964844,
-                            "Profit/Loss": -133.00018310546875,
-                            "Return %": -0.527841340084656,
-                            "Hold Time (Days)": 23,
-                            "Trade Type": "Long"
-                        },
-                        {
-                            "Entry Date": "2024-08-02 09:30:00",
-                            "Entry Price": 242.60000610351562,
-                            "Position Size": 100.0,
-                            "Exit Date": "2024-08-30 09:30:00",
-                            "Exit Price": 255.86000061035156,
-                            "Profit/Loss": 1325.9994506835938,
-                            "Return %": 5.465784902403503,
-                            "Hold Time (Days)": 28,
-                            "Trade Type": "Long"
-                        },
-                        {
-                            "Entry Date": "2024-08-30 10:30:00",
-                            "Entry Price": 254.1999969482422,
-                            "Position Size": 100.0,
-                            "Exit Date": "2024-09-06 12:30:00",
-                            "Exit Price": 242.75999450683594,
-                            "Profit/Loss": -1144.000244140625,
-                            "Return %": -4.500394405486774,
-                            "Hold Time (Days)": 7,
-                            "Trade Type": "Long"
-                        },
-                        {
-                            "Entry Date": "2024-10-23 09:30:00",
-                            "Entry Price": 285.489990234375,
-                            "Position Size": 100.0,
-                            "Exit Date": "2024-11-15 09:30:00",
-                            "Exit Price": 325.3900146484375,
-                            "Profit/Loss": 3990.00244140625,
-                            "Return %": 13.975980167047641,
-                            "Hold Time (Days)": 23,
-                            "Trade Type": "Long"
-                        },
-                        {
-                            "Entry Date": "2024-11-18 11:30:00",
-                            "Entry Price": 321.7699890136719,
+                            "Entry Date": "2024-11-22 15:30:00",
+                            "Entry Price": 342.010009765625,
                             "Position Size": 100.0,
                             "Exit Date": "2024-11-22 15:30:00",
                             "Exit Price": 342.010009765625,
-                            "Profit/Loss": 2024.0020751953125,
-                            "Return %": 6.290213955004087,
-                            "Hold Time (Days)": 4,
+                            "Profit/Loss": 0.0,
+                            "Return %": 0.0,
+                            "Hold Time (Days)": 0,
                             "Trade Type": "Long"
                         }
                     ],
                     "Symbol Statistics": {
                         "Trade Summary": {
-                            "Total Trades": 8,
-                            "Winning Trades": 5,
-                            "Losing Trades": 3,
-                            "Win Rate %": 62.5
+                            "Total Trades": 3,
+                            "Winning Trades": 1,
+                            "Losing Trades": 1,
+                            "Win Rate %": 33.33333333333333
                         },
                         "Profit Metrics": {
-                            "Total Profit": 9636.500549316406,
-                            "Total Loss": 6546.4996337890625,
-                            "Net Profit": 3090.0009155273438,
-                            "Profit Factor": 1.4720081094297528,
-                            "Average Win": 1927.3001098632812,
-                            "Average Loss": 2182.166544596354,
-                            "Largest Win": 3990.00244140625,
-                            "Largest Loss": -5269.499206542969
+                            "Total Profit": 263.99993896484375,
+                            "Total Loss": 2668.0007934570312,
+                            "Net Profit": -2404.0008544921875,
+                            "Profit Factor": 0.09895047243324424,
+                            "Average Win": 263.99993896484375,
+                            "Average Loss": 2668.0007934570312,
+                            "Largest Win": 263.99993896484375,
+                            "Largest Loss": -2668.0007934570312
                         },
                         "Trade Timing": {
-                            "Average Hold Time (Days)": 16.125,
-                            "Shortest Trade (Days)": 4.0,
-                            "Longest Trade (Days)": 28.0
+                            "Average Hold Time (Days)": 60.0,
+                            "Shortest Trade (Days)": 0.0,
+                            "Longest Trade (Days)": 161.0
                         },
                         "Risk Metrics": {
-                            "Max Drawdown %": 5.281216434735074,
-                            "Risk-Reward Ratio": 0.8832048656578517,
-                            "Average Risk per Trade": 2022.8750228881836
+                            "Max Drawdown %": 2.6680007934570313,
+                            "Risk-Reward Ratio": 0.09895047243324424,
+                            "Average Risk per Trade": 977.3335774739584
                         },
                         "Market Analysis": {
                             "Correlation with Market": NaN,
                             "Performance in Different Market Conditions": {
                                 "Uptrend": {
                                     "Number of Trades": 3,
-                                    "Win Rate": 66.66666666666666,
-                                    "Average Profit": 1999.6668497721355
+                                    "Win Rate": 33.33333333333333,
+                                    "Average Profit": -801.3336181640625
                                 },
                                 "Downtrend": {
-                                    "Number of Trades": 5,
-                                    "Win Rate": 60.0,
-                                    "Average Profit": -581.7999267578125
+                                    "Number of Trades": 0,
+                                    "Win Rate": 0,
+                                    "Average Profit": 0
                                 },
                                 "Sideways": {
                                     "Number of Trades": 0,
@@ -867,111 +428,67 @@
                 "CSCO": {
                     "Trades": [
                         {
-                            "Entry Date": "2024-01-31 09:30:00",
-                            "Entry Price": 50.60499954223633,
+                            "Entry Date": "2024-04-10 09:30:00",
+                            "Entry Price": 48.915000915527344,
                             "Position Size": 100.0,
-                            "Exit Date": "2024-02-21 09:30:00",
-                            "Exit Price": 48.064998626708984,
-                            "Profit/Loss": -254.00009155273438,
-                            "Return %": -5.019268725429759,
-                            "Hold Time (Days)": 21,
+                            "Exit Date": "2024-07-12 09:30:00",
+                            "Exit Price": 47.3650016784668,
+                            "Profit/Loss": -154.9999237060547,
+                            "Return %": -3.1687605193696733,
+                            "Hold Time (Days)": 93,
                             "Trade Type": "Long"
                         },
                         {
-                            "Entry Date": "2024-04-02 12:30:00",
-                            "Entry Price": 49.20500183105469,
-                            "Position Size": 100.0,
-                            "Exit Date": "2024-04-29 14:30:00",
-                            "Exit Price": 47.654998779296875,
-                            "Profit/Loss": -155.00030517578125,
-                            "Return %": -3.1500924582418377,
-                            "Hold Time (Days)": 27,
-                            "Trade Type": "Long"
-                        },
-                        {
-                            "Entry Date": "2024-05-20 09:30:00",
-                            "Entry Price": 47.58000183105469,
-                            "Position Size": 100.0,
-                            "Exit Date": "2024-06-10 09:30:00",
-                            "Exit Price": 45.73500061035156,
-                            "Profit/Loss": -184.5001220703125,
-                            "Return %": -3.8776821137045947,
-                            "Hold Time (Days)": 21,
-                            "Trade Type": "Long"
-                        },
-                        {
-                            "Entry Date": "2024-07-05 09:30:00",
-                            "Entry Price": 46.334999084472656,
-                            "Position Size": 100.0,
-                            "Exit Date": "2024-07-24 09:30:00",
-                            "Exit Price": 46.41999816894531,
-                            "Profit/Loss": 8.499908447265625,
-                            "Return %": 0.1834446663475653,
-                            "Hold Time (Days)": 19,
-                            "Trade Type": "Long"
-                        },
-                        {
-                            "Entry Date": "2024-08-02 10:30:00",
-                            "Entry Price": 46.459999084472656,
-                            "Position Size": 100.0,
-                            "Exit Date": "2024-09-06 10:30:00",
-                            "Exit Price": 48.42499923706055,
-                            "Profit/Loss": 196.50001525878906,
-                            "Return %": 4.229445095371531,
-                            "Hold Time (Days)": 35,
-                            "Trade Type": "Long"
-                        },
-                        {
-                            "Entry Date": "2024-09-06 11:30:00",
-                            "Entry Price": 48.30500030517578,
+                            "Entry Date": "2024-07-16 09:30:00",
+                            "Entry Price": 47.779998779296875,
                             "Position Size": 100.0,
                             "Exit Date": "2024-11-22 15:30:00",
                             "Exit Price": 58.560001373291016,
-                            "Profit/Loss": 1025.5001068115234,
-                            "Return %": 21.229688444938134,
-                            "Hold Time (Days)": 77,
+                            "Profit/Loss": 1078.000259399414,
+                            "Return %": 22.561747319811843,
+                            "Hold Time (Days)": 129,
                             "Trade Type": "Long"
                         }
                     ],
                     "Symbol Statistics": {
                         "Trade Summary": {
-                            "Total Trades": 6,
-                            "Winning Trades": 3,
-                            "Losing Trades": 3,
+                            "Total Trades": 2,
+                            "Winning Trades": 1,
+                            "Losing Trades": 1,
                             "Win Rate %": 50.0
                         },
                         "Profit Metrics": {
-                            "Total Profit": 1230.5000305175781,
-                            "Total Loss": 593.5005187988281,
-                            "Net Profit": 636.99951171875,
-                            "Profit Factor": 2.073292257617497,
-                            "Average Win": 410.1666768391927,
-                            "Average Loss": 197.83350626627603,
-                            "Largest Win": 1025.5001068115234,
-                            "Largest Loss": -254.00009155273438
+                            "Total Profit": 1078.000259399414,
+                            "Total Loss": 154.9999237060547,
+                            "Net Profit": 923.0003356933594,
+                            "Profit Factor": 6.954843806528304,
+                            "Average Win": 1078.000259399414,
+                            "Average Loss": 154.9999237060547,
+                            "Largest Win": 1078.000259399414,
+                            "Largest Loss": -154.9999237060547
                         },
                         "Trade Timing": {
-                            "Average Hold Time (Days)": 33.333333333333336,
-                            "Shortest Trade (Days)": 19.0,
-                            "Longest Trade (Days)": 77.0
+                            "Average Hold Time (Days)": 111.0,
+                            "Shortest Trade (Days)": 93.0,
+                            "Longest Trade (Days)": 129.0
                         },
                         "Risk Metrics": {
-                            "Max Drawdown %": 0.5935005187988281,
-                            "Risk-Reward Ratio": 2.073292257617497,
-                            "Average Risk per Trade": 304.0000915527344
+                            "Max Drawdown %": 0.15499992370605467,
+                            "Risk-Reward Ratio": 6.954843806528304,
+                            "Average Risk per Trade": 616.5000915527344
                         },
                         "Market Analysis": {
                             "Correlation with Market": NaN,
                             "Performance in Different Market Conditions": {
                                 "Uptrend": {
-                                    "Number of Trades": 5,
-                                    "Win Rate": 40.0,
-                                    "Average Profit": -77.70011901855469
+                                    "Number of Trades": 1,
+                                    "Win Rate": 100.0,
+                                    "Average Profit": 1078.000259399414
                                 },
                                 "Downtrend": {
                                     "Number of Trades": 1,
-                                    "Win Rate": 100.0,
-                                    "Average Profit": 1025.5001068115234
+                                    "Win Rate": 0.0,
+                                    "Average Profit": -154.9999237060547
                                 },
                                 "Sideways": {
                                     "Number of Trades": 0,
