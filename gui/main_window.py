@@ -292,6 +292,13 @@ class MainWindow(QMainWindow):
         
         layout.addLayout(controls_layout)
         
+        # Add checkbox for detailed report
+        report_layout = QHBoxLayout()
+        self.generate_report_checkbox = QCheckBox("Generate Detailed Performance Report")
+        self.generate_report_checkbox.setToolTip("Creates a detailed JSON report with all backtest results and trade details")
+        report_layout.addWidget(self.generate_report_checkbox)
+        layout.addLayout(report_layout)
+        
         # Results tabs
         self.tabs = QTabWidget()
         layout.addWidget(self.tabs)
@@ -567,6 +574,11 @@ class MainWindow(QMainWindow):
         successful_stocks = [s for s in stock_symbols if s not in failed_symbols]
         successful_cryptos = [s for s in crypto_symbols if s not in failed_symbols]
         self.update_symbol_history(successful_stocks, successful_cryptos)
+        
+        # Generate detailed report if checkbox is checked
+        if self.generate_report_checkbox.isChecked():
+            successful_symbols = successful_stocks + successful_cryptos
+            self.generate_detailed_report(aggregated_results, successful_symbols, selected_strategies)
         
         # Show failed symbols message if any
         if failed_symbols:
@@ -931,6 +943,79 @@ class MainWindow(QMainWindow):
                 f"{current_text}\n"
                 f"Current Operation Progress: {value}%"
             )
+
+    def generate_detailed_report(self, aggregated_results, symbols, selected_strategies):
+        """Generate a detailed JSON report of all backtest results"""
+        report = {
+            "summary": {
+                "strategies": {},
+                "test_parameters": {
+                    "start_date": self.start_date.date().toPyDate().isoformat(),
+                    "end_date": self.end_date.date().toPyDate().isoformat(),
+                    "timeframe": self.timeframe_selection.currentText(),
+                    "initial_capital": self.initial_capital.value(),
+                    "position_sizing": {
+                        "method": self.position_method.currentText(),
+                        "size_value": self.position_size.value()
+                    }
+                }
+            },
+            "detailed_results": {}
+        }
+
+        # Add summary data
+        for strategy_name, results in aggregated_results.items():
+            report["summary"]["strategies"][strategy_name] = {
+                "net_profit": results["net_profit"],
+                "total_trades": results["total_trades"],
+                "winning_trades": results["winning_trades"],
+                "total_symbols": results["total_symbols"],
+                "max_drawdown": results["max_drawdown"],
+                "profit_factor": results["profit_factor"],
+                "symbols_tested": results["symbols"]
+            }
+
+        # Add detailed trade results for each symbol and strategy
+        for symbol in symbols:
+            report["detailed_results"][symbol] = {}
+            for strategy_class in selected_strategies:
+                strategy_name = strategy_class.__name__
+                trades = self.backtest_engine.get_trade_details(symbol, strategy_name)
+                
+                if trades:
+                    # Convert trade details to serializable format
+                    serializable_trades = []
+                    for trade in trades:
+                        serializable_trade = {
+                            "entry_date": trade["entry_date"].isoformat(),
+                            "entry_price": trade["entry_price"],
+                            "position": trade["position"],
+                            "exit_date": trade["exit_date"].isoformat() if "exit_date" in trade else None,
+                            "exit_price": trade["exit_price"] if "exit_price" in trade else None,
+                            "profit": trade["profit"]
+                        }
+                        serializable_trades.append(serializable_trade)
+                    
+                    report["detailed_results"][symbol][strategy_name] = {
+                        "trades": serializable_trades
+                    }
+
+        # Save report to file
+        import json
+        from datetime import datetime
+        
+        # Create filename with timestamp
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        filename = f"backtest_report_{timestamp}.json"
+        
+        with open(filename, 'w') as f:
+            json.dump(report, f, indent=4)
+            
+        QMessageBox.information(
+            self,
+            "Report Generated",
+            f"Detailed performance report has been saved to:\n{filename}"
+        )
 
 class TradeDetailsDialog(QDialog):
     def __init__(self, trades, price_data):
