@@ -1,7 +1,7 @@
 {
-    "Report Generated": "2024-11-23 22:49:39",
+    "Report Generated": "2024-11-23 23:44:55",
     "Strategies": {
-        "CustomBalancedStrategy": {
+        "AdaptiveMAStrategy": {
             "Strategy Overview": {
                 "Objective": "Not specified",
                 "Type of Strategy": "Not specified",
@@ -9,115 +9,8 @@
                 "Time Horizon": "Not specified",
                 "Assumptions": "Not specified"
             },
-            "Performance Metrics": {
-                "Return Metrics": {
-                    "Net Profit": 112215.53155183792,
-                    "Total Return %": 18.702588591972987,
-                    "Annualized Return %": 23.208283220809488,
-                    "CAGR %": 0,
-                    "Monthly Returns": {}
-                },
-                "Risk-Adjusted Return": {
-                    "Sharpe Ratio": NaN,
-                    "Sortino Ratio": NaN,
-                    "Calmar Ratio": 0
-                },
-                "Drawdown Metrics": {
-                    "Maximum Drawdown %": 0.09239768981933594,
-                    "Average Drawdown %": 0,
-                    "Recovery Time": "Not implemented"
-                }
-            },
-            "Risk Analysis": {
-                "Volatility": {
-                    "Annual Volatility %": NaN,
-                    "Beta": 0
-                },
-                "Tail Risk Metrics": {
-                    "Value at Risk (95%)": 0,
-                    "Value at Risk (99%)": 0,
-                    "Conditional VaR (95%)": 0
-                },
-                "Position Sizing": {
-                    "Method": "PositionSizingMethod.CONTRACT_SIZE",
-                    "Size Value": 100.0
-                }
-            },
-            "Trade Statistics": {
-                "Trade Counts": {
-                    "Total Trades": 13,
-                    "Winning Trades": 0,
-                    "Losing Trades": 0
-                },
-                "Trade Metrics": {
-                    "Win Rate %": 58.333333333333336,
-                    "Average Trade Duration": 13.152777777777777,
-                    "Profit Factor": Infinity,
-                    "Expectancy": 0
-                },
-                "Profit Analysis": {
-                    "Average Win": 0,
-                    "Average Loss": 0,
-                    "Largest Win": 0,
-                    "Largest Loss": 0,
-                    "Profit Distribution": {}
-                },
-                "Market Environment Performance": {}
-            },
-            "Backtest Analysis": {
-                "Data Quality": {
-                    "Data Source": "Yahoo Finance/Binance",
-                    "Number of Symbols": 7,
-                    "Symbols Tested": "BABA, BAC, BB, BIP, BKNG, BLNK",
-                    "Adjustments": "Adjusted for splits and dividends"
-                },
-                "Backtest Settings": {
-                    "Initial Capital": 100000.0,
-                    "Date Range": "2022-11-23 to 2024-11-23",
-                    "Timeframe": "1d",
-                    "Commission Model": "Not implemented",
-                    "Slippage Model": "Not implemented"
-                }
-            },
-            "Operational Feasibility": {
-                "Liquidity Analysis": "Not implemented",
-                "Transaction Costs": {
-                    "Average Spread": "Not implemented",
-                    "Commission per Trade": "Not implemented",
-                    "Estimated Slippage": "Not implemented"
-                },
-                "Scalability": {
-                    "Maximum Position Size": "Not implemented",
-                    "Capacity Limit": "Not implemented"
-                }
-            },
-            "Summary and Recommendations": {
-                "Key Findings": {
-                    "Profitability": "Profitable",
-                    "Risk-Adjusted Performance": {
-                        "Assessment": "Poor",
-                        "Sharpe Ratio": "nan",
-                        "Sortino Ratio": "nan",
-                        "Calmar Ratio": "0.00"
-                    },
-                    "Consistency": {
-                        "Win Rate": "Moderate",
-                        "Profit Factor": "Strong",
-                        "Risk Level": "Low Risk",
-                        "Details": {
-                            "Win Rate": "58.3%",
-                            "Profit Factor": "inf",
-                            "Maximum Drawdown": "0.1%"
-                        }
-                    }
-                },
-                "Strengths": [
-                    "High win rate",
-                    "Strong profit factor"
-                ],
-                "Weaknesses": [],
-                "Suggested Improvements": "Not implemented"
-            }
+            "Aggregate Performance": {},
+            "Symbol Performance": {}
         }
     }
 }
