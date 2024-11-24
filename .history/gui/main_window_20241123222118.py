@@ -394,9 +394,6 @@ class MainWindow(QMainWindow):
         # Create a dictionary to store aggregated results for each strategy
         aggregated_results = {}
         
-        # Keep track of failed symbols
-        failed_symbols = []
-        
         for symbol in symbols:
             try:
                 # Create results table
@@ -420,11 +417,15 @@ class MainWindow(QMainWindow):
                         data = data_fetcher.get_stock_data(symbol, start_date, end_date, interval=selected_timeframe)
                     
                     if data.empty:
-                        failed_symbols.append(symbol)
-                        continue
+                        raise ValueError(f"No data available for {symbol}")
                     
                 except Exception as e:
-                    failed_symbols.append(symbol)
+                    QMessageBox.warning(
+                        self,
+                        "Data Fetch Error",
+                        f"Error fetching data for {symbol}: {str(e)}\n"
+                        "This might be due to timeframe limitations or invalid symbol."
+                    )
                     continue
                     
                 # Run only selected strategies
@@ -516,25 +517,13 @@ class MainWindow(QMainWindow):
                 
                 self.tabs.addTab(table, symbol)
             except Exception as e:
-                failed_symbols.append(symbol)
-                continue
+                QMessageBox.warning(self, "Error", f"Error processing {symbol}: {str(e)}") 
         
         # Create summary tab
         self.create_summary_tab(aggregated_results)
         
         # After successful backtest, update symbol history
-        successful_stocks = [s for s in stock_symbols if s not in failed_symbols]
-        successful_cryptos = [s for s in crypto_symbols if s not in failed_symbols]
-        self.update_symbol_history(successful_stocks, successful_cryptos)
-        
-        # Show failed symbols message if any
-        if failed_symbols:
-            QMessageBox.information(
-                self,
-                "Unavailable Symbols",
-                f"The following symbols could not be processed:\n{', '.join(failed_symbols)}\n\n"
-                "This might be due to invalid symbols or data availability issues."
-            )
+        self.update_symbol_history(stock_symbols, crypto_symbols)
 
     def create_summary_tab(self, aggregated_results):
         """Create a summary tab showing performance across all symbols"""
