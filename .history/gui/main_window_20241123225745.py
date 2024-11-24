@@ -495,8 +495,7 @@ class MainWindow(QMainWindow):
                             'sortino_ratio': 0,
                             'avg_drawdown': 0,
                             'win_rate': 0,
-                            'avg_trade_duration': 0,
-                            'avg_trade': 0
+                            'avg_trade_duration': 0
                         }
                     
                     agg = aggregated_results[strategy_class.__name__]
@@ -513,7 +512,6 @@ class MainWindow(QMainWindow):
                     agg['sortino_ratio'] = (agg['sortino_ratio'] * (len(agg['symbols'])) + result['sortino_ratio']) / (len(agg['symbols']) + 1)
                     agg['win_rate'] = (agg['win_rate'] * (len(agg['symbols'])) + result['win_rate']) / (len(agg['symbols']) + 1)
                     agg['avg_trade_duration'] = (agg['avg_trade_duration'] * (len(agg['symbols'])) + result.get('avg_bars_in_trade', 0)) / (len(agg['symbols']) + 1)
-                    agg['avg_trade'] = (agg['avg_trade'] * (len(agg['symbols'])) + result.get('avg_trade', 0)) / (len(agg['symbols']) + 1)
                     agg['symbols'].append(symbol)
                     agg['strategy_instances'].append(strategy)
                     
@@ -971,7 +969,7 @@ class MainWindow(QMainWindow):
                         "Total Net Profit": results['net_profit'],
                         "Total Number of Trades": results['total_trades'],
                         "Overall Win Rate": results['win_rate'],
-                        "Average Trade": results.get('avg_trade', 0),
+                        "Average Trade": results['avg_trade'],
                         "Profit Factor": results['profit_factor'],
                         "Maximum Drawdown": results['max_drawdown']
                     },
