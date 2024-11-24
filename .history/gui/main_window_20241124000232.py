@@ -360,14 +360,12 @@ class MainWindow(QMainWindow):
         total_operations = len(symbols) * len(selected_strategies)
         current_operation = 0
         
-        # Create and show progress dialog
-        self.progress_dialog = QProgressDialog(self)
+        # Create progress dialog
+        self.progress_dialog = QProgressDialog("Running backtests...", "Cancel", 0, 100, self)
         self.progress_dialog.setWindowTitle("Backtest Progress")
-        self.progress_dialog.setLabelText("Initializing backtests...")
-        self.progress_dialog.setRange(0, 100)
         self.progress_dialog.setWindowModality(Qt.WindowModality.WindowModal)
-        self.progress_dialog.setMinimumDuration(0)  # Show immediately
-        self.progress_dialog.show()  # Explicitly show the dialog
+        self.progress_dialog.setAutoClose(True)
+        self.progress_dialog.setAutoReset(True)
         
         data_fetcher = DataFetcher()
         self.backtest_engine = BacktestEngine(self.initial_capital.value())
@@ -412,158 +410,146 @@ class MainWindow(QMainWindow):
         
         # Create a dictionary to store aggregated results for each strategy
         aggregated_results = {}
+        
+        # Keep track of failed symbols
         failed_symbols = []
         
-        try:
-            for symbol_idx, symbol in enumerate(symbols):
-                if self.progress_dialog.wasCanceled():
-                    break
-                    
+        for symbol in symbols:
+            if self.progress_dialog.wasCanceled():
+                break
+                
+            try:
+                # Update progress dialog message
+                self.progress_dialog.setLabelText(f"Processing {symbol}...")
+                
+                # Create results table
+                table = QTableWidget()
+                table.setColumnCount(7)
+                table.setHorizontalHeaderLabels([
+                    'Strategy',
+                    'Net Profit',
+                    'Total Trades',
+                    'Win Rate %',
+                    'Profit Factor',
+                    'Max Drawdown %',
+                    'Avg Trade'
+                ])
+                
+                # Get data with selected timeframe
                 try:
-                    # Update progress dialog message
-                    self.progress_dialog.setLabelText(f"Processing {symbol}...")
+                    if '/' in symbol:  # Crypto
+                        data = data_fetcher.get_crypto_data(symbol, start_date, end_date, interval=selected_timeframe)
+                    else:  # Stock
+                        data = data_fetcher.get_stock_data(symbol, start_date, end_date, interval=selected_timeframe)
                     
-                    # Get data with selected timeframe
-                    try:
-                        if '/' in symbol:  # Crypto
-                            data = data_fetcher.get_crypto_data(symbol, start_date, end_date, interval=selected_timeframe)
-                        else:  # Stock
-                            data = data_fetcher.get_stock_data(symbol, start_date, end_date, interval=selected_timeframe)
-                        
-                        if data.empty:
-                            failed_symbols.append(symbol)
-                            continue
-                        
-                    except Exception as e:
+                    if data.empty:
                         failed_symbols.append(symbol)
                         continue
                     
-                    # Create results table
-                    table = QTableWidget()
-                    table.setColumnCount(7)
-                    table.setHorizontalHeaderLabels([
-                        'Strategy',
-                        'Net Profit',
-                        'Total Trades',
-                        'Win Rate %',
-                        'Profit Factor',
-                        'Max Drawdown %',
-                        'Avg Trade'
-                    ])
-                    
-                    # Run strategies
-                    results = []
-                    for strategy_idx, strategy_class in enumerate(selected_strategies):
-                        if self.progress_dialog.wasCanceled():
-                            break
-                            
-                        # Update progress for overall operation
-                        current_operation = (symbol_idx * len(selected_strategies) + strategy_idx)
-                        overall_progress = int((current_operation / total_operations) * 100)
-                        self.progress_dialog.setLabelText(
-                            f"Processing {symbol} with {strategy_class.__name__}...\n"
-                            f"Overall Progress: {overall_progress}%"
-                        )
-                        self.progress_dialog.setValue(overall_progress)
-                        
-                        # Run only selected strategies
-                        if strategy_class.__name__ == "FlawlessVictoryStrategy":
-                            version = int(self.version_selection.currentText())
-                            strategy = strategy_class(self.initial_capital.value(), version=version)
-                        else:
-                            strategy = strategy_class(self.initial_capital.value())
-                        
-                        # Set position sizing for the strategy
-                        strategy.position_sizing_method = method
-                        strategy.position_size_value = size_value
-                        
-                        # Use the instance attribute backtest_engine
-                        result = self.backtest_engine.run_backtest(data, strategy, ticker=symbol)
-                        results.append((strategy_class.__name__, result))
-                        
-                        # Aggregate results
-                        if strategy_class.__name__ not in aggregated_results:
-                            aggregated_results[strategy_class.__name__] = {
-                                'net_profit': 0,
-                                'total_trades': 0,
-                                'winning_trades': 0,
-                                'total_symbols': 0,
-                                'max_drawdown': 0,
-                                'profit_factor': 0,
-                                'symbols': []
-                            }
-                        
-                        agg = aggregated_results[strategy_class.__name__]
-                        agg['net_profit'] += result['net_profit']
-                        agg['total_trades'] += result['total_trades']
-                        agg['winning_trades'] += (result['win_rate'] * result['total_trades'] / 100)
-                        agg['total_symbols'] += 1
-                        agg['max_drawdown'] = max(agg['max_drawdown'], result['max_drawdown'])
-                        agg['profit_factor'] = (agg['profit_factor'] * (len(agg['symbols'])) + result['profit_factor']) / (len(agg['symbols']) + 1)
-                        agg['symbols'].append(symbol)
-                        
-                    # Fill table
-                    table.setRowCount(len(results))
-                    for i, (strategy_name, result) in enumerate(results):
-                        # Strategy name (text)
-                        strategy_item = QTableWidgetItem(strategy_name)
-                        strategy_item.setData(Qt.ItemDataRole.DisplayRole, strategy_name)
-                        table.setItem(i, 0, strategy_item)
-                        
-                        # Net Profit (numerical)
-                        net_profit_item = QTableWidgetItem()
-                        net_profit_item.setData(Qt.ItemDataRole.DisplayRole, f"${result['net_profit']:.2f}")
-                        net_profit_item.setData(Qt.ItemDataRole.EditRole, float(result['net_profit']))
-                        table.setItem(i, 1, net_profit_item)
-                        
-                        # Total Trades (numerical)
-                        total_trades = int(result['total_trades'])
-                        trades_item = NumberTableWidgetItem(total_trades)
-                        table.setItem(i, 2, trades_item)
-                        
-                        # Win Rate (numerical)
-                        win_rate_item = QTableWidgetItem()
-                        win_rate_item.setData(Qt.ItemDataRole.DisplayRole, f"{result['win_rate']:.1f}%")
-                        win_rate_item.setData(Qt.ItemDataRole.EditRole, float(result['win_rate']))
-                        table.setItem(i, 3, win_rate_item)
-                        
-                        # Profit Factor (numerical)
-                        pf_item = QTableWidgetItem()
-                        pf_item.setData(Qt.ItemDataRole.DisplayRole, f"{result['profit_factor']:.2f}")
-                        pf_item.setData(Qt.ItemDataRole.EditRole, float(result['profit_factor']))
-                        table.setItem(i, 4, pf_item)
-                        
-                        # Max Drawdown (numerical)
-                        dd_item = QTableWidgetItem()
-                        dd_item.setData(Qt.ItemDataRole.DisplayRole, f"{result['max_drawdown']:.1f}%")
-                        dd_item.setData(Qt.ItemDataRole.EditRole, float(result['max_drawdown']))
-                        table.setItem(i, 5, dd_item)
-                        
-                        # Avg Trade (numerical)
-                        avg_trade_item = QTableWidgetItem()
-                        avg_trade_item.setData(Qt.ItemDataRole.DisplayRole, f"${result['avg_trade']:.2f}")
-                        avg_trade_item.setData(Qt.ItemDataRole.EditRole, float(result['avg_trade']))
-                        table.setItem(i, 6, avg_trade_item)
-                        
-                    # Enable sorting on the table
-                    table.setSortingEnabled(True)
-                    
-                    # Connect the header click to the custom handler
-                    table.horizontalHeader().sectionClicked.connect(lambda section, tbl=table: self.handle_header_click(section, tbl))
-                    
-                    self.tabs.addTab(table, symbol)
                 except Exception as e:
                     failed_symbols.append(symbol)
                     continue
+                    
+                # Run only selected strategies
+                results = []
+                for strategy_class in selected_strategies:
+                    if strategy_class.__name__ == "FlawlessVictoryStrategy":
+                        version = int(self.version_selection.currentText())
+                        strategy = strategy_class(self.initial_capital.value(), version=version)
+                    else:
+                        strategy = strategy_class(self.initial_capital.value())
+                    
+                    # Set position sizing for the strategy
+                    strategy.position_sizing_method = method
+                    strategy.position_size_value = size_value
+                    
+                    # Use the instance attribute backtest_engine
+                    result = self.backtest_engine.run_backtest(data, strategy, ticker=symbol)
+                    results.append((strategy_class.__name__, result))
+                    
+                    # Aggregate results
+                    if strategy_class.__name__ not in aggregated_results:
+                        aggregated_results[strategy_class.__name__] = {
+                            'net_profit': 0,
+                            'total_trades': 0,
+                            'winning_trades': 0,
+                            'total_symbols': 0,
+                            'max_drawdown': 0,
+                            'profit_factor': 0,
+                            'symbols': []
+                        }
+                    
+                    agg = aggregated_results[strategy_class.__name__]
+                    agg['net_profit'] += result['net_profit']
+                    agg['total_trades'] += result['total_trades']
+                    agg['winning_trades'] += (result['win_rate'] * result['total_trades'] / 100)
+                    agg['total_symbols'] += 1
+                    agg['max_drawdown'] = max(agg['max_drawdown'], result['max_drawdown'])
+                    agg['profit_factor'] = (agg['profit_factor'] * (len(agg['symbols'])) + result['profit_factor']) / (len(agg['symbols']) + 1)
+                    agg['symbols'].append(symbol)
+                    
+                # Fill table
+                table.setRowCount(len(results))
+                for i, (strategy_name, result) in enumerate(results):
+                    # Strategy name (text)
+                    strategy_item = QTableWidgetItem(strategy_name)
+                    strategy_item.setData(Qt.ItemDataRole.DisplayRole, strategy_name)
+                    table.setItem(i, 0, strategy_item)
+                    
+                    # Net Profit (numerical)
+                    net_profit_item = QTableWidgetItem()
+                    net_profit_item.setData(Qt.ItemDataRole.DisplayRole, f"${result['net_profit']:.2f}")
+                    net_profit_item.setData(Qt.ItemDataRole.EditRole, float(result['net_profit']))
+                    table.setItem(i, 1, net_profit_item)
+                    
+                    # Total Trades (numerical)
+                    total_trades = int(result['total_trades'])
+                    trades_item = NumberTableWidgetItem(total_trades)
+                    table.setItem(i, 2, trades_item)
+                    
+                    # Win Rate (numerical)
+                    win_rate_item = QTableWidgetItem()
+                    win_rate_item.setData(Qt.ItemDataRole.DisplayRole, f"{result['win_rate']:.1f}%")
+                    win_rate_item.setData(Qt.ItemDataRole.EditRole, float(result['win_rate']))
+                    table.setItem(i, 3, win_rate_item)
+                    
+                    # Profit Factor (numerical)
+                    pf_item = QTableWidgetItem()
+                    pf_item.setData(Qt.ItemDataRole.DisplayRole, f"{result['profit_factor']:.2f}")
+                    pf_item.setData(Qt.ItemDataRole.EditRole, float(result['profit_factor']))
+                    table.setItem(i, 4, pf_item)
+                    
+                    # Max Drawdown (numerical)
+                    dd_item = QTableWidgetItem()
+                    dd_item.setData(Qt.ItemDataRole.DisplayRole, f"{result['max_drawdown']:.1f}%")
+                    dd_item.setData(Qt.ItemDataRole.EditRole, float(result['max_drawdown']))
+                    table.setItem(i, 5, dd_item)
+                    
+                    # Avg Trade (numerical)
+                    avg_trade_item = QTableWidgetItem()
+                    avg_trade_item.setData(Qt.ItemDataRole.DisplayRole, f"${result['avg_trade']:.2f}")
+                    avg_trade_item.setData(Qt.ItemDataRole.EditRole, float(result['avg_trade']))
+                    table.setItem(i, 6, avg_trade_item)
+                    
+                # Enable sorting on the table
+                table.setSortingEnabled(True)
                 
-        finally:
-            # Ensure progress dialog is closed
-            if self.progress_dialog:
-                self.progress_dialog.close()
-                self.progress_dialog = None
+                # Connect the header click to the custom handler
+                table.horizontalHeader().sectionClicked.connect(lambda section, tbl=table: self.handle_header_click(section, tbl))
+                
+                self.tabs.addTab(table, symbol)
+            except Exception as e:
+                failed_symbols.append(symbol)
+                continue
         
-        # Create summary tab and update symbol history
+        # Close progress dialog
+        self.progress_dialog.close()
+        self.progress_dialog = None
+        
+        # Create summary tab
         self.create_summary_tab(aggregated_results)
+        
+        # After successful backtest, update symbol history
         successful_stocks = [s for s in stock_symbols if s not in failed_symbols]
         successful_cryptos = [s for s in crypto_symbols if s not in failed_symbols]
         self.update_symbol_history(successful_stocks, successful_cryptos)
@@ -925,12 +911,7 @@ class MainWindow(QMainWindow):
     def update_progress(self, value):
         """Update the progress bar for individual backtest operations"""
         if self.progress_dialog and not self.progress_dialog.wasCanceled():
-            # Keep the overall progress value but update the label to show individual progress
-            current_text = self.progress_dialog.labelText().split('\n')[0]
-            self.progress_dialog.setLabelText(
-                f"{current_text}\n"
-                f"Current Operation Progress: {value}%"
-            )
+            self.progress_dialog.setValue(value)
 
 class TradeDetailsDialog(QDialog):
     def __init__(self, trades, price_data):
