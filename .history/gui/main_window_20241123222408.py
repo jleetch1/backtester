@@ -1,6 +1,6 @@
 from PyQt6.QtWidgets import (QMainWindow, QWidget, QVBoxLayout, QHBoxLayout,
                             QPushButton, QLabel, QDateEdit, QDoubleSpinBox,
-                            QTableWidget, QTableWidgetItem, QTabWidget, QLineEdit, QMessageBox, QComboBox, QDialog, QSplitter, QCheckBox, QMenu, QProgressBar, QStatusBar, QApplication)
+                            QTableWidget, QTableWidgetItem, QTabWidget, QLineEdit, QMessageBox, QComboBox, QDialog, QSplitter, QCheckBox, QMenu, QProgressBar, QStatusBar)
 from PyQt6.QtCore import Qt, QDate
 import sys
 from datetime import datetime
@@ -542,7 +542,7 @@ class MainWindow(QMainWindow):
                 continue
             
             # Process Qt events to keep UI responsive
-            QApplication.instance().processEvents()
+            QApplication.processEvents()
         
         # Update progress bar to completion
         self.progressBar.setValue(total_operations)
