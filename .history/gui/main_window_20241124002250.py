@@ -3,7 +3,6 @@ from PyQt6.QtWidgets import (QMainWindow, QWidget, QVBoxLayout, QHBoxLayout,
                             QTableWidget, QTableWidgetItem, QTabWidget, QLineEdit, QMessageBox, QComboBox, QDialog, QSplitter, QCheckBox, QMenu, QProgressBar, QProgressDialog)
 from PyQt6.QtCore import Qt, QDate
 import sys
-import json
 from datetime import datetime
 from core.data_fetcher import DataFetcher
 from core.backtest_engine import BacktestEngine
