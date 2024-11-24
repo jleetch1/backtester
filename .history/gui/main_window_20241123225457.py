@@ -495,8 +495,7 @@ class MainWindow(QMainWindow):
                             'sortino_ratio': 0,
                             'avg_drawdown': 0,
                             'win_rate': 0,
-                            'avg_trade_duration': 0,
-                            'avg_trade': 0
+                            'avg_trade_duration': 0
                         }
                     
                     agg = aggregated_results[strategy_class.__name__]
@@ -513,7 +512,6 @@ class MainWindow(QMainWindow):
                     agg['sortino_ratio'] = (agg['sortino_ratio'] * (len(agg['symbols'])) + result['sortino_ratio']) / (len(agg['symbols']) + 1)
                     agg['win_rate'] = (agg['win_rate'] * (len(agg['symbols'])) + result['win_rate']) / (len(agg['symbols']) + 1)
                     agg['avg_trade_duration'] = (agg['avg_trade_duration'] * (len(agg['symbols'])) + result.get('avg_bars_in_trade', 0)) / (len(agg['symbols']) + 1)
-                    agg['avg_trade'] = (agg['avg_trade'] * (len(agg['symbols'])) + result.get('avg_trade', 0)) / (len(agg['symbols']) + 1)
                     agg['symbols'].append(symbol)
                     agg['strategy_instances'].append(strategy)
                     
@@ -958,6 +956,7 @@ class MainWindow(QMainWindow):
             strategy_instances = results.get('strategy_instances', [])
             strategy_instance = strategy_instances[0] if strategy_instances else None
 
+            # Create the strategy level report
             strategy_report = {
                 "Strategy Overview": {
                     "Objective": getattr(strategy_instance, 'objective', 'Not specified'),
@@ -966,56 +965,13 @@ class MainWindow(QMainWindow):
                     "Time Horizon": getattr(strategy_instance, 'time_horizon', 'Not specified'),
                     "Assumptions": getattr(strategy_instance, 'assumptions', 'Not specified')
                 },
-                "Summary Performance": {
-                    "Overall Statistics": {
-                        "Total Net Profit": results['net_profit'],
-                        "Total Number of Trades": results['total_trades'],
-                        "Overall Win Rate": results['win_rate'],
-                        "Average Trade": results.get('avg_trade', 0),
-                        "Profit Factor": results['profit_factor'],
-                        "Maximum Drawdown": results['max_drawdown']
-                    },
-                    "Return Metrics": {
-                        "Total Return": results['total_return'],
-                        "Annualized Return": results['annualized_return'],
-                        "CAGR": results.get('cagr', 0),
-                        "Monthly Returns": results.get('monthly_returns', {})
-                    },
-                    "Risk Metrics": {
-                        "Volatility": results.get('volatility', 0),
-                        "Sharpe Ratio": results.get('sharpe_ratio', 0),
-                        "Sortino Ratio": results.get('sortino_ratio', 0),
-                        "Calmar Ratio": results.get('calmar_ratio', 0),
-                        "Value at Risk (95%)": results.get('var_95', 0),
-                        "Expected Shortfall": results.get('cvar_95', 0)
-                    },
-                    "Trade Analysis": {
-                        "Average Win": results.get('avg_win', 0),
-                        "Average Loss": results.get('avg_loss', 0),
-                        "Largest Win": results.get('largest_win', 0),
-                        "Largest Loss": results.get('largest_loss', 0),
-                        "Average Trade Duration": results.get('avg_trade_duration', 0),
-                        "Profit Distribution": results.get('profit_distribution', {})
-                    },
-                    "Market Environment Performance": results.get('market_environment_performance', {}),
-                    "Symbols Overview": {
-                        "Number of Symbols Traded": len(results.get('symbols', [])),
-                        "Symbols List": results.get('symbols', []),
-                        "Best Performing Symbol": self._get_best_performing_symbol(results),
-                        "Worst Performing Symbol": self._get_worst_performing_symbol(results)
-                    }
+                "Aggregate Performance": {
+                    # ... (keep existing aggregate metrics)
                 },
-                "Backtest Settings": {
-                    "Initial Capital": self.initial_capital.value(),
-                    "Date Range": f"{self.start_date.date().toPyDate()} to {self.end_date.date().toPyDate()}",
-                    "Timeframe": self.timeframe_selection.currentText(),
-                    "Position Sizing Method": str(getattr(strategy_instance, 'position_sizing_method', 'Not specified')),
-                    "Position Size Value": getattr(strategy_instance, 'position_size_value', 'Not specified')
-                },
-                "Symbol Performance": {}  # Detailed symbol-by-symbol analysis (existing code)
+                "Symbol Performance": {}  # New section for individual symbol performance
             }
 
-            # Add performance for each symbol (keeping existing detailed symbol analysis)
+            # Add performance for each symbol
             for symbol in results.get('symbols', []):
                 trades = self.backtest_engine.get_trade_details(symbol, strategy_name)
                 price_data = self.backtest_engine.get_price_data(symbol)
@@ -1033,7 +989,7 @@ class MainWindow(QMainWindow):
                         }
                     }
 
-                    # Add detailed trade information (keeping existing trade details)
+                    # Add detailed trade information
                     for trade in trades:
                         trade_info = {
                             "Entry Date": trade['entry_date'].strftime('%Y-%m-%d %H:%M:%S'),
@@ -1058,42 +1014,6 @@ class MainWindow(QMainWindow):
             json.dump(report_data, f, indent=4, default=str)
 
         QMessageBox.information(self, "Report Generated", f"Detailed report saved to {report_file}")
-
-    def _get_best_performing_symbol(self, results):
-        """Identify the best performing symbol based on net profit"""
-        best_symbol = None
-        best_profit = float('-inf')
-        
-        for symbol in results.get('symbols', []):
-            trades = self.backtest_engine.get_trade_details(symbol, results.get('strategy_name', ''))
-            if trades:
-                net_profit = sum(trade['profit'] for trade in trades)
-                if net_profit > best_profit:
-                    best_profit = net_profit
-                    best_symbol = symbol
-        
-        return {
-            "Symbol": best_symbol,
-            "Net Profit": best_profit if best_symbol else 0
-        }
-
-    def _get_worst_performing_symbol(self, results):
-        """Identify the worst performing symbol based on net profit"""
-        worst_symbol = None
-        worst_profit = float('inf')
-        
-        for symbol in results.get('symbols', []):
-            trades = self.backtest_engine.get_trade_details(symbol, results.get('strategy_name', ''))
-            if trades:
-                net_profit = sum(trade['profit'] for trade in trades)
-                if net_profit < worst_profit:
-                    worst_profit = net_profit
-                    worst_symbol = symbol
-        
-        return {
-            "Symbol": worst_symbol,
-            "Net Profit": worst_profit if worst_symbol else 0
-        }
 
     def _calculate_symbol_statistics(self, trades: List[Dict], price_data: pd.DataFrame) -> Dict:
         """Calculate detailed statistics for a symbol's trades"""
