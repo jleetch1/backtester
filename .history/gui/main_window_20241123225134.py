@@ -956,7 +956,6 @@ class MainWindow(QMainWindow):
             strategy_instances = results.get('strategy_instances', [])
             strategy_instance = strategy_instances[0] if strategy_instances else None
 
-            # Create the strategy level report
             strategy_report = {
                 "Strategy Overview": {
                     "Objective": getattr(strategy_instance, 'objective', 'Not specified'),
@@ -965,46 +964,95 @@ class MainWindow(QMainWindow):
                     "Time Horizon": getattr(strategy_instance, 'time_horizon', 'Not specified'),
                     "Assumptions": getattr(strategy_instance, 'assumptions', 'Not specified')
                 },
-                "Aggregate Performance": {
-                    # ... (keep existing aggregate metrics)
-                },
-                "Symbol Performance": {}  # New section for individual symbol performance
-            }
-
-            # Add performance for each symbol
-            for symbol in results.get('symbols', []):
-                trades = self.backtest_engine.get_trade_details(symbol, strategy_name)
-                price_data = self.backtest_engine.get_price_data(symbol)
-                
-                if trades:
-                    symbol_report = {
-                        "Trades": [],
-                        "Symbol Statistics": self._calculate_symbol_statistics(trades, price_data),
-                        "Price Data": {
-                            "Start Date": price_data.index[0].strftime('%Y-%m-%d'),
-                            "End Date": price_data.index[-1].strftime('%Y-%m-%d'),
-                            "Initial Price": float(price_data['Close'].iloc[0]),
-                            "Final Price": float(price_data['Close'].iloc[-1]),
-                            "Price Change %": float((price_data['Close'].iloc[-1] / price_data['Close'].iloc[0] - 1) * 100)
-                        }
+                "Performance Metrics": {
+                    "Return Metrics": {
+                        "Net Profit": results.get('net_profit', 0),
+                        "Total Return %": results.get('total_return', 0),
+                        "Annualized Return %": results.get('annualized_return', 0),
+                        "CAGR %": results.get('cagr', 0),
+                        "Monthly Returns": results.get('monthly_returns', {})
+                    },
+                    "Risk-Adjusted Return": {
+                        "Sharpe Ratio": results.get('sharpe_ratio', 0),
+                        "Sortino Ratio": results.get('sortino_ratio', 0),
+                        "Calmar Ratio": results.get('calmar_ratio', 0)
+                    },
+                    "Drawdown Metrics": {
+                        "Maximum Drawdown %": results.get('max_drawdown', 0),
+                        "Average Drawdown %": results.get('avg_drawdown', 0),
+                        "Recovery Time": "Not implemented"  # TODO: Implement this
                     }
-
-                    # Add detailed trade information
-                    for trade in trades:
-                        trade_info = {
-                            "Entry Date": trade['entry_date'].strftime('%Y-%m-%d %H:%M:%S'),
-                            "Entry Price": float(trade['entry_price']),
-                            "Position Size": float(trade['position']),
-                            "Exit Date": trade['exit_date'].strftime('%Y-%m-%d %H:%M:%S'),
-                            "Exit Price": float(trade['exit_price']),
-                            "Profit/Loss": float(trade['profit']),
-                            "Return %": float((trade['exit_price'] / trade['entry_price'] - 1) * 100),
-                            "Hold Time (Days)": (trade['exit_date'] - trade['entry_date']).days,
-                            "Trade Type": "Long" if trade['position'] > 0 else "Short"
-                        }
-                        symbol_report["Trades"].append(trade_info)
-
-                    strategy_report["Symbol Performance"][symbol] = symbol_report
+                },
+                "Risk Analysis": {
+                    "Volatility": {
+                        "Annual Volatility %": results.get('volatility', 0),
+                        "Beta": results.get('beta', 0)
+                    },
+                    "Tail Risk Metrics": {
+                        "Value at Risk (95%)": results.get('var_95', 0),
+                        "Value at Risk (99%)": results.get('var_99', 0),
+                        "Conditional VaR (95%)": results.get('cvar_95', 0)
+                    },
+                    "Position Sizing": {
+                        "Method": str(getattr(strategy_instance, 'position_sizing_method', 'Not specified')),
+                        "Size Value": getattr(strategy_instance, 'position_size_value', 'Not specified')
+                    }
+                },
+                "Trade Statistics": {
+                    "Trade Counts": {
+                        "Total Trades": results.get('total_trades', 0),
+                        "Winning Trades": results.get('winning_trades_count', 0),
+                        "Losing Trades": results.get('losing_trades_count', 0)
+                    },
+                    "Trade Metrics": {
+                        "Win Rate %": results.get('win_rate', 0),
+                        "Average Trade Duration": results.get('avg_trade_duration', 0),
+                        "Profit Factor": results.get('profit_factor', 0),
+                        "Expectancy": results.get('expectancy', 0)
+                    },
+                    "Profit Analysis": {
+                        "Average Win": results.get('avg_win', 0),
+                        "Average Loss": results.get('avg_loss', 0),
+                        "Largest Win": results.get('largest_win', 0),
+                        "Largest Loss": results.get('largest_loss', 0),
+                        "Profit Distribution": results.get('profit_distribution', {})
+                    },
+                    "Market Environment Performance": results.get('market_environment_performance', {})
+                },
+                "Backtest Analysis": {
+                    "Data Quality": {
+                        "Data Source": "Yahoo Finance/Binance",
+                        "Number of Symbols": results.get('total_symbols', 0),
+                        "Symbols Tested": ", ".join(results.get('symbols', [])),
+                        "Adjustments": "Adjusted for splits and dividends"
+                    },
+                    "Backtest Settings": {
+                        "Initial Capital": self.initial_capital.value(),
+                        "Date Range": f"{self.start_date.date().toPyDate()} to {self.end_date.date().toPyDate()}",
+                        "Timeframe": self.timeframe_selection.currentText(),
+                        "Commission Model": "Not implemented",  # TODO: Implement this
+                        "Slippage Model": "Not implemented"  # TODO: Implement this
+                    }
+                },
+                "Operational Feasibility": {
+                    "Liquidity Analysis": "Not implemented",  # TODO: Implement this
+                    "Transaction Costs": {
+                        "Average Spread": "Not implemented",
+                        "Commission per Trade": "Not implemented",
+                        "Estimated Slippage": "Not implemented"
+                    },
+                    "Scalability": {
+                        "Maximum Position Size": "Not implemented",
+                        "Capacity Limit": "Not implemented"
+                    }
+                },
+                "Summary and Recommendations": {
+                    "Key Findings": self._generate_key_findings(results),
+                    "Strengths": self._analyze_strengths(results),
+                    "Weaknesses": self._analyze_weaknesses(results),
+                    "Suggested Improvements": "Not implemented"  # TODO: Implement this
+                }
+            }
 
             report_data["Strategies"][strategy_name] = strategy_report
 
@@ -1015,140 +1063,98 @@ class MainWindow(QMainWindow):
 
         QMessageBox.information(self, "Report Generated", f"Detailed report saved to {report_file}")
 
-    def _calculate_symbol_statistics(self, trades: List[Dict], price_data: pd.DataFrame) -> Dict:
-        """Calculate detailed statistics for a symbol's trades"""
-        if not trades:
-            return {}
-
-        winning_trades = [t for t in trades if t['profit'] > 0]
-        losing_trades = [t for t in trades if t['profit'] < 0]
-        
-        total_profit = sum(t['profit'] for t in winning_trades)
-        total_loss = abs(sum(t['profit'] for t in losing_trades))
-        
+    def _generate_key_findings(self, results: Dict) -> Dict:
+        """Generate key findings from the results"""
         return {
-            "Trade Summary": {
-                "Total Trades": len(trades),
-                "Winning Trades": len(winning_trades),
-                "Losing Trades": len(losing_trades),
-                "Win Rate %": (len(winning_trades) / len(trades) * 100) if trades else 0
-            },
-            "Profit Metrics": {
-                "Total Profit": float(total_profit),
-                "Total Loss": float(total_loss),
-                "Net Profit": float(total_profit - total_loss),
-                "Profit Factor": float(total_profit / total_loss) if total_loss != 0 else float('inf'),
-                "Average Win": float(total_profit / len(winning_trades)) if winning_trades else 0,
-                "Average Loss": float(total_loss / len(losing_trades)) if losing_trades else 0,
-                "Largest Win": float(max((t['profit'] for t in winning_trades), default=0)),
-                "Largest Loss": float(min((t['profit'] for t in losing_trades), default=0))
-            },
-            "Trade Timing": {
-                "Average Hold Time (Days)": float(sum((t['exit_date'] - t['entry_date']).days for t in trades) / len(trades)),
-                "Shortest Trade (Days)": float(min((t['exit_date'] - t['entry_date']).days for t in trades)),
-                "Longest Trade (Days)": float(max((t['exit_date'] - t['entry_date']).days for t in trades))
-            },
-            "Risk Metrics": {
-                "Max Drawdown %": self._calculate_symbol_drawdown(trades),
-                "Risk-Reward Ratio": self._calculate_risk_reward_ratio(trades),
-                "Average Risk per Trade": self._calculate_average_risk_per_trade(trades)
-            },
-            "Market Analysis": {
-                "Correlation with Market": self._calculate_market_correlation(trades, price_data),
-                "Performance in Different Market Conditions": self._analyze_market_conditions(trades, price_data)
-            }
+            "Profitability": "Profitable" if results.get('net_profit', 0) > 0 else "Unprofitable",
+            "Risk-Adjusted Performance": self._assess_risk_adjusted_performance(results),
+            "Consistency": self._assess_consistency(results)
         }
 
-    def _calculate_symbol_drawdown(self, trades: List[Dict]) -> float:
-        """Calculate maximum drawdown for a symbol's trades"""
-        equity_curve = []
-        current_equity = self.initial_capital
-        max_drawdown = 0
-        peak = current_equity
+    def _analyze_strengths(self, results: Dict) -> List[str]:
+        """Analyze strategy strengths"""
+        strengths = []
+        if results.get('win_rate', 0) > 50:
+            strengths.append("High win rate")
+        if results.get('profit_factor', 0) > 2:
+            strengths.append("Strong profit factor")
+        if results.get('sharpe_ratio', 0) > 1:
+            strengths.append("Good risk-adjusted returns")
+        return strengths
 
-        for trade in trades:
-            current_equity += trade['profit']
-            equity_curve.append(current_equity)
-            
-            if current_equity > peak:
-                peak = current_equity
-            elif peak > 0:
-                drawdown = (peak - current_equity) / peak * 100
-                max_drawdown = max(max_drawdown, drawdown)
+    def _analyze_weaknesses(self, results: Dict) -> List[str]:
+        """Analyze strategy weaknesses"""
+        weaknesses = []
+        if results.get('max_drawdown', 0) > 20:
+            weaknesses.append("High maximum drawdown")
+        if results.get('win_rate', 0) < 40:
+            weaknesses.append("Low win rate")
+        if results.get('profit_factor', 0) < 1.5:
+            weaknesses.append("Low profit factor")
+        return weaknesses
 
-        return float(max_drawdown)
+    def _assess_risk_adjusted_performance(self, results: Dict) -> str:
+        """Assess the risk-adjusted performance of the strategy"""
+        sharpe_ratio = results.get('sharpe_ratio', 0)
+        sortino_ratio = results.get('sortino_ratio', 0)
+        calmar_ratio = results.get('calmar_ratio', 0)
+        
+        if sharpe_ratio > 2:
+            performance = "Excellent"
+        elif sharpe_ratio > 1:
+            performance = "Good"
+        elif sharpe_ratio > 0:
+            performance = "Moderate"
+        else:
+            performance = "Poor"
+        
+        details = {
+            "Assessment": performance,
+            "Sharpe Ratio": f"{sharpe_ratio:.2f}",
+            "Sortino Ratio": f"{sortino_ratio:.2f}",
+            "Calmar Ratio": f"{calmar_ratio:.2f}"
+        }
+        
+        return details
 
-    def _calculate_risk_reward_ratio(self, trades: List[Dict]) -> float:
-        """Calculate risk-reward ratio for trades"""
-        winning_trades = [t for t in trades if t['profit'] > 0]
-        losing_trades = [t for t in trades if t['profit'] < 0]
+    def _assess_consistency(self, results: Dict) -> Dict:
+        """Assess the consistency of the strategy's performance"""
+        win_rate = results.get('win_rate', 0)
+        profit_factor = results.get('profit_factor', 0)
+        max_drawdown = results.get('max_drawdown', 0)
         
-        if not winning_trades or not losing_trades:
-            return 0
+        # Assess win rate
+        if win_rate > 60:
+            win_rate_assessment = "High"
+        elif win_rate > 45:
+            win_rate_assessment = "Moderate"
+        else:
+            win_rate_assessment = "Low"
         
-        avg_win = sum(t['profit'] for t in winning_trades) / len(winning_trades)
-        avg_loss = abs(sum(t['profit'] for t in losing_trades) / len(losing_trades))
+        # Assess profit factor
+        if profit_factor > 2:
+            profit_factor_assessment = "Strong"
+        elif profit_factor > 1.5:
+            profit_factor_assessment = "Good"
+        else:
+            profit_factor_assessment = "Weak"
         
-        return float(avg_win / avg_loss) if avg_loss != 0 else float('inf')
-
-    def _calculate_average_risk_per_trade(self, trades: List[Dict]) -> float:
-        """Calculate average risk per trade"""
-        if not trades:
-            return 0
-        
-        risks = [abs(t['entry_price'] - t['exit_price']) * t['position'] for t in trades]
-        return float(sum(risks) / len(risks))
-
-    def _calculate_market_correlation(self, trades: List[Dict], price_data: pd.DataFrame) -> float:
-        """Calculate correlation between trade returns and market returns"""
-        if not trades or price_data.empty:
-            return 0
-        
-        trade_returns = pd.Series([t['profit'] for t in trades])
-        market_returns = price_data['Close'].pct_change().dropna()
-        
-        if len(trade_returns) > 1 and len(market_returns) > 1:
-            return float(trade_returns.corr(market_returns))
-        return 0
-
-    def _analyze_market_conditions(self, trades: List[Dict], price_data: pd.DataFrame) -> Dict:
-        """Analyze performance under different market conditions"""
-        if not trades or price_data.empty:
-            return {}
-
-        # Calculate market trend using simple moving averages
-        price_data['SMA20'] = price_data['Close'].rolling(window=20).mean()
-        price_data['SMA50'] = price_data['Close'].rolling(window=50).mean()
-        
-        uptrend_trades = []
-        downtrend_trades = []
-        sideways_trades = []
-        
-        for trade in trades:
-            entry_idx = price_data.index.get_loc(trade['entry_date'])
-            if entry_idx >= 50:  # Ensure we have enough data for trend determination
-                if price_data['SMA20'].iloc[entry_idx] > price_data['SMA50'].iloc[entry_idx]:
-                    uptrend_trades.append(trade)
-                elif price_data['SMA20'].iloc[entry_idx] < price_data['SMA50'].iloc[entry_idx]:
-                    downtrend_trades.append(trade)
-                else:
-                    sideways_trades.append(trade)
+        # Assess drawdown
+        if max_drawdown < 10:
+            risk_assessment = "Low Risk"
+        elif max_drawdown < 20:
+            risk_assessment = "Moderate Risk"
+        else:
+            risk_assessment = "High Risk"
         
         return {
-            "Uptrend": {
-                "Number of Trades": len(uptrend_trades),
-                "Win Rate": float(len([t for t in uptrend_trades if t['profit'] > 0]) / len(uptrend_trades) * 100) if uptrend_trades else 0,
-                "Average Profit": float(sum(t['profit'] for t in uptrend_trades) / len(uptrend_trades)) if uptrend_trades else 0
-            },
-            "Downtrend": {
-                "Number of Trades": len(downtrend_trades),
-                "Win Rate": float(len([t for t in downtrend_trades if t['profit'] > 0]) / len(downtrend_trades) * 100) if downtrend_trades else 0,
-                "Average Profit": float(sum(t['profit'] for t in downtrend_trades) / len(downtrend_trades)) if downtrend_trades else 0
-            },
-            "Sideways": {
-                "Number of Trades": len(sideways_trades),
-                "Win Rate": float(len([t for t in sideways_trades if t['profit'] > 0]) / len(sideways_trades) * 100) if sideways_trades else 0,
-                "Average Profit": float(sum(t['profit'] for t in sideways_trades) / len(sideways_trades)) if sideways_trades else 0
+            "Win Rate": win_rate_assessment,
+            "Profit Factor": profit_factor_assessment,
+            "Risk Level": risk_assessment,
+            "Details": {
+                "Win Rate": f"{win_rate:.1f}%",
+                "Profit Factor": f"{profit_factor:.2f}",
+                "Maximum Drawdown": f"{max_drawdown:.1f}%"
             }
         }
 

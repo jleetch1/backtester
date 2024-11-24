@@ -15,7 +15,7 @@ import pandas as pd
 from strategies.base_strategy import PositionSizingMethod
 from core.symbol_manager import SymbolManager
 from PyQt6.QtGui import QFocusEvent
-from typing import List, Dict
+from typing import List
 import json
 
 class NumberTableWidgetItem(QTableWidgetItem):
@@ -956,7 +956,6 @@ class MainWindow(QMainWindow):
             strategy_instances = results.get('strategy_instances', [])
             strategy_instance = strategy_instances[0] if strategy_instances else None
 
-            # Create the strategy level report
             strategy_report = {
                 "Strategy Overview": {
                     "Objective": getattr(strategy_instance, 'objective', 'Not specified'),
@@ -965,46 +964,60 @@ class MainWindow(QMainWindow):
                     "Time Horizon": getattr(strategy_instance, 'time_horizon', 'Not specified'),
                     "Assumptions": getattr(strategy_instance, 'assumptions', 'Not specified')
                 },
-                "Aggregate Performance": {
-                    # ... (keep existing aggregate metrics)
+                "Performance Metrics": {
+                    "Return Metrics": {
+                        "Net Profit": results.get('net_profit', 0),
+                        "Total Return %": results.get('total_return', 0),
+                        "Annualized Return %": results.get('annualized_return', 0)
+                    },
+                    "Risk-Adjusted Return": {
+                        "Sharpe Ratio": results.get('sharpe_ratio', 0),
+                        "Sortino Ratio": results.get('sortino_ratio', 0)
+                    },
+                    "Drawdown Metrics": {
+                        "Maximum Drawdown %": results.get('max_drawdown', 0),
+                        "Average Drawdown %": results.get('avg_drawdown', 0)
+                    }
                 },
-                "Symbol Performance": {}  # New section for individual symbol performance
+                "Risk Analysis": {
+                    "Volatility %": results.get('volatility', 0),
+                    "Beta": results.get('beta', 0)
+                }
             }
 
-            # Add performance for each symbol
-            for symbol in results.get('symbols', []):
-                trades = self.backtest_engine.get_trade_details(symbol, strategy_name)
-                price_data = self.backtest_engine.get_price_data(symbol)
-                
-                if trades:
-                    symbol_report = {
-                        "Trades": [],
-                        "Symbol Statistics": self._calculate_symbol_statistics(trades, price_data),
-                        "Price Data": {
-                            "Start Date": price_data.index[0].strftime('%Y-%m-%d'),
-                            "End Date": price_data.index[-1].strftime('%Y-%m-%d'),
-                            "Initial Price": float(price_data['Close'].iloc[0]),
-                            "Final Price": float(price_data['Close'].iloc[-1]),
-                            "Price Change %": float((price_data['Close'].iloc[-1] / price_data['Close'].iloc[0] - 1) * 100)
-                        }
-                    }
+            # Add Trade Statistics
+            strategy_report["Trade Statistics"] = {
+                "Total Trades": results.get('total_trades', 0),
+                "Winning Trades": results.get('winning_trades', 0),
+                "Losing Trades": results.get('total_trades', 0) - results.get('winning_trades', 0),
+                "Win Rate %": results.get('win_rate', 0),
+                "Average Trade Duration (days)": results.get('avg_trade_duration', 0)
+            }
 
-                    # Add detailed trade information
-                    for trade in trades:
-                        trade_info = {
-                            "Entry Date": trade['entry_date'].strftime('%Y-%m-%d %H:%M:%S'),
-                            "Entry Price": float(trade['entry_price']),
-                            "Position Size": float(trade['position']),
-                            "Exit Date": trade['exit_date'].strftime('%Y-%m-%d %H:%M:%S'),
-                            "Exit Price": float(trade['exit_price']),
-                            "Profit/Loss": float(trade['profit']),
-                            "Return %": float((trade['exit_price'] / trade['entry_price'] - 1) * 100),
-                            "Hold Time (Days)": (trade['exit_date'] - trade['entry_date']).days,
-                            "Trade Type": "Long" if trade['position'] > 0 else "Short"
-                        }
-                        symbol_report["Trades"].append(trade_info)
+            # Add Risk Management details
+            if strategy_instance:
+                strategy_report["Risk Management Framework"] = {
+                    "Position Sizing Method": str(getattr(strategy_instance, 'position_sizing_method', 'Not specified')),
+                    "Position Size Value": getattr(strategy_instance, 'position_size_value', 'Not specified')
+                }
+            else:
+                strategy_report["Risk Management Framework"] = {
+                    "Position Sizing Method": "Not Available",
+                    "Position Size Value": "Not Available"
+                }
 
-                    strategy_report["Symbol Performance"][symbol] = symbol_report
+            # Add Backtest Analysis
+            strategy_report["Backtest Analysis"] = {
+                "Data Quality": {
+                    "Number of Symbols": results.get('total_symbols', 0),
+                    "Symbols Tested": ", ".join(results.get('symbols', []))
+                },
+                "Backtest Settings": {
+                    "Initial Capital": self.initial_capital.value(),
+                    "Date Range": f"{self.start_date.date().toPyDate()} to {self.end_date.date().toPyDate()}",
+                    "Timeframe": self.timeframe_selection.currentText()
+                }
+            }
 
             report_data["Strategies"][strategy_name] = strategy_report
 
@@ -1014,143 +1027,6 @@ class MainWindow(QMainWindow):
             json.dump(report_data, f, indent=4, default=str)
 
         QMessageBox.information(self, "Report Generated", f"Detailed report saved to {report_file}")
-
-    def _calculate_symbol_statistics(self, trades: List[Dict], price_data: pd.DataFrame) -> Dict:
-        """Calculate detailed statistics for a symbol's trades"""
-        if not trades:
-            return {}
-
-        winning_trades = [t for t in trades if t['profit'] > 0]
-        losing_trades = [t for t in trades if t['profit'] < 0]
-        
-        total_profit = sum(t['profit'] for t in winning_trades)
-        total_loss = abs(sum(t['profit'] for t in losing_trades))
-        
-        return {
-            "Trade Summary": {
-                "Total Trades": len(trades),
-                "Winning Trades": len(winning_trades),
-                "Losing Trades": len(losing_trades),
-                "Win Rate %": (len(winning_trades) / len(trades) * 100) if trades else 0
-            },
-            "Profit Metrics": {
-                "Total Profit": float(total_profit),
-                "Total Loss": float(total_loss),
-                "Net Profit": float(total_profit - total_loss),
-                "Profit Factor": float(total_profit / total_loss) if total_loss != 0 else float('inf'),
-                "Average Win": float(total_profit / len(winning_trades)) if winning_trades else 0,
-                "Average Loss": float(total_loss / len(losing_trades)) if losing_trades else 0,
-                "Largest Win": float(max((t['profit'] for t in winning_trades), default=0)),
-                "Largest Loss": float(min((t['profit'] for t in losing_trades), default=0))
-            },
-            "Trade Timing": {
-                "Average Hold Time (Days)": float(sum((t['exit_date'] - t['entry_date']).days for t in trades) / len(trades)),
-                "Shortest Trade (Days)": float(min((t['exit_date'] - t['entry_date']).days for t in trades)),
-                "Longest Trade (Days)": float(max((t['exit_date'] - t['entry_date']).days for t in trades))
-            },
-            "Risk Metrics": {
-                "Max Drawdown %": self._calculate_symbol_drawdown(trades),
-                "Risk-Reward Ratio": self._calculate_risk_reward_ratio(trades),
-                "Average Risk per Trade": self._calculate_average_risk_per_trade(trades)
-            },
-            "Market Analysis": {
-                "Correlation with Market": self._calculate_market_correlation(trades, price_data),
-                "Performance in Different Market Conditions": self._analyze_market_conditions(trades, price_data)
-            }
-        }
-
-    def _calculate_symbol_drawdown(self, trades: List[Dict]) -> float:
-        """Calculate maximum drawdown for a symbol's trades"""
-        equity_curve = []
-        current_equity = self.initial_capital
-        max_drawdown = 0
-        peak = current_equity
-
-        for trade in trades:
-            current_equity += trade['profit']
-            equity_curve.append(current_equity)
-            
-            if current_equity > peak:
-                peak = current_equity
-            elif peak > 0:
-                drawdown = (peak - current_equity) / peak * 100
-                max_drawdown = max(max_drawdown, drawdown)
-
-        return float(max_drawdown)
-
-    def _calculate_risk_reward_ratio(self, trades: List[Dict]) -> float:
-        """Calculate risk-reward ratio for trades"""
-        winning_trades = [t for t in trades if t['profit'] > 0]
-        losing_trades = [t for t in trades if t['profit'] < 0]
-        
-        if not winning_trades or not losing_trades:
-            return 0
-        
-        avg_win = sum(t['profit'] for t in winning_trades) / len(winning_trades)
-        avg_loss = abs(sum(t['profit'] for t in losing_trades) / len(losing_trades))
-        
-        return float(avg_win / avg_loss) if avg_loss != 0 else float('inf')
-
-    def _calculate_average_risk_per_trade(self, trades: List[Dict]) -> float:
-        """Calculate average risk per trade"""
-        if not trades:
-            return 0
-        
-        risks = [abs(t['entry_price'] - t['exit_price']) * t['position'] for t in trades]
-        return float(sum(risks) / len(risks))
-
-    def _calculate_market_correlation(self, trades: List[Dict], price_data: pd.DataFrame) -> float:
-        """Calculate correlation between trade returns and market returns"""
-        if not trades or price_data.empty:
-            return 0
-        
-        trade_returns = pd.Series([t['profit'] for t in trades])
-        market_returns = price_data['Close'].pct_change().dropna()
-        
-        if len(trade_returns) > 1 and len(market_returns) > 1:
-            return float(trade_returns.corr(market_returns))
-        return 0
-
-    def _analyze_market_conditions(self, trades: List[Dict], price_data: pd.DataFrame) -> Dict:
-        """Analyze performance under different market conditions"""
-        if not trades or price_data.empty:
-            return {}
-
-        # Calculate market trend using simple moving averages
-        price_data['SMA20'] = price_data['Close'].rolling(window=20).mean()
-        price_data['SMA50'] = price_data['Close'].rolling(window=50).mean()
-        
-        uptrend_trades = []
-        downtrend_trades = []
-        sideways_trades = []
-        
-        for trade in trades:
-            entry_idx = price_data.index.get_loc(trade['entry_date'])
-            if entry_idx >= 50:  # Ensure we have enough data for trend determination
-                if price_data['SMA20'].iloc[entry_idx] > price_data['SMA50'].iloc[entry_idx]:
-                    uptrend_trades.append(trade)
-                elif price_data['SMA20'].iloc[entry_idx] < price_data['SMA50'].iloc[entry_idx]:
-                    downtrend_trades.append(trade)
-                else:
-                    sideways_trades.append(trade)
-        
-        return {
-            "Uptrend": {
-                "Number of Trades": len(uptrend_trades),
-                "Win Rate": float(len([t for t in uptrend_trades if t['profit'] > 0]) / len(uptrend_trades) * 100) if uptrend_trades else 0,
-                "Average Profit": float(sum(t['profit'] for t in uptrend_trades) / len(uptrend_trades)) if uptrend_trades else 0
-            },
-            "Downtrend": {
-                "Number of Trades": len(downtrend_trades),
-                "Win Rate": float(len([t for t in downtrend_trades if t['profit'] > 0]) / len(downtrend_trades) * 100) if downtrend_trades else 0,
-                "Average Profit": float(sum(t['profit'] for t in downtrend_trades) / len(downtrend_trades)) if downtrend_trades else 0
-            },
-            "Sideways": {
-                "Number of Trades": len(sideways_trades),
-                "Win Rate": float(len([t for t in sideways_trades if t['profit'] > 0]) / len(sideways_trades) * 100) if sideways_trades else 0,
-                "Average Profit": float(sum(t['profit'] for t in sideways_trades) / len(sideways_trades)) if sideways_trades else 0
-            }
-        }
 
 class TradeDetailsDialog(QDialog):
     def __init__(self, trades, price_data):
