@@ -992,7 +992,31 @@ class MainWindow(QMainWindow):
                             "position": trade["position"],
                             "exit_date": trade["exit_date"].isoformat() if "exit_date" in trade else None,
                             "exit_price": trade["exit_price"] if "exit_price" in trade else None,
-                            "profit": trade["profit"]
+                            "profit": trade["profit"],
+                            # Add entry metrics
+                            "entry_metrics": {
+                                "volume": trade["entry_metrics"]["volume"],
+                                "volatility": trade["entry_metrics"]["volatility"],
+                                "rsi": trade["entry_metrics"]["rsi"],
+                                "sma_20": trade["entry_metrics"]["sma_20"],
+                                "sma_50": trade["entry_metrics"]["sma_50"],
+                                "atr": trade["entry_metrics"]["atr"],
+                                "high": trade["entry_metrics"]["high"],
+                                "low": trade["entry_metrics"]["low"],
+                                "open": trade["entry_metrics"]["open"]
+                            },
+                            # Add exit metrics if they exist
+                            "exit_metrics": {
+                                "volume": trade["exit_metrics"]["volume"],
+                                "volatility": trade["exit_metrics"]["volatility"],
+                                "rsi": trade["exit_metrics"]["rsi"],
+                                "sma_20": trade["exit_metrics"]["sma_20"],
+                                "sma_50": trade["exit_metrics"]["sma_50"],
+                                "atr": trade["exit_metrics"]["atr"],
+                                "high": trade["exit_metrics"]["high"],
+                                "low": trade["exit_metrics"]["low"],
+                                "open": trade["exit_metrics"]["open"]
+                            } if "exit_metrics" in trade else None
                         }
                         serializable_trades.append(serializable_trade)
                     

@@ -17,7 +17,32 @@ class BacktestEngine(QObject):
         # Store the price data
         self.price_data[ticker] = data
         
+        # Calculate additional indicators that we want to track
         df = strategy.generate_signals(data)
+        
+        # Add volatility (20-day rolling standard deviation of returns)
+        df['Returns'] = df['Close'].pct_change()
+        df['Volatility'] = df['Returns'].rolling(window=20).std() * 100  # as percentage
+        
+        # Add RSI (14-period)
+        delta = df['Close'].diff()
+        gain = (delta.where(delta > 0, 0)).rolling(window=14).mean()
+        loss = (-delta.where(delta < 0, 0)).rolling(window=14).mean()
+        rs = gain / loss
+        df['RSI'] = 100 - (100 / (1 + rs))
+        
+        # Add Moving Averages
+        df['SMA_20'] = df['Close'].rolling(window=20).mean()
+        df['SMA_50'] = df['Close'].rolling(window=50).mean()
+        
+        # Add ATR (Average True Range)
+        high_low = df['High'] - df['Low']
+        high_close = abs(df['High'] - df['Close'].shift())
+        low_close = abs(df['Low'] - df['Close'].shift())
+        ranges = pd.concat([high_low, high_close, low_close], axis=1)
+        true_range = ranges.max(axis=1)
+        df['ATR'] = true_range.rolling(window=14).mean()
+        
         total_rows = len(df)
         
         # Initialize results
@@ -38,7 +63,18 @@ class BacktestEngine(QObject):
                     'entry_date': index,
                     'entry_price': entry_price,
                     'position': position,
-                    'profit': 0  # Initialize profit
+                    'profit': 0,
+                    'entry_metrics': {
+                        'volume': row['Volume'],
+                        'volatility': row['Volatility'],
+                        'rsi': row['RSI'],
+                        'sma_20': row['SMA_20'],
+                        'sma_50': row['SMA_50'],
+                        'atr': row['ATR'],
+                        'high': row['High'],
+                        'low': row['Low'],
+                        'open': row['Open']
+                    }
                 })
                 
             elif row['Signal'] == -1 and position != 0:  # Sell signal
@@ -49,20 +85,43 @@ class BacktestEngine(QObject):
                 trades[-1].update({
                     'exit_date': index,
                     'exit_price': exit_price,
-                    'profit': trade_profit
+                    'profit': trade_profit,
+                    'exit_metrics': {
+                        'volume': row['Volume'],
+                        'volatility': row['Volatility'],
+                        'rsi': row['RSI'],
+                        'sma_20': row['SMA_20'],
+                        'sma_50': row['SMA_50'],
+                        'atr': row['ATR'],
+                        'high': row['High'],
+                        'low': row['Low'],
+                        'open': row['Open']
+                    }
                 })
                 
                 position = 0
         
         # Close any open position at the end
         if position != 0:
-            exit_price = df['Close'].iloc[-1]
+            last_row = df.iloc[-1]
+            exit_price = last_row['Close']
             trade_profit = (exit_price - entry_price) * position
             capital += trade_profit
             trades[-1].update({
                 'exit_date': df.index[-1],
                 'exit_price': exit_price,
-                'profit': trade_profit
+                'profit': trade_profit,
+                'exit_metrics': {
+                    'volume': last_row['Volume'],
+                    'volatility': last_row['Volatility'],
+                    'rsi': last_row['RSI'],
+                    'sma_20': last_row['SMA_20'],
+                    'sma_50': last_row['SMA_50'],
+                    'atr': last_row['ATR'],
+                    'high': last_row['High'],
+                    'low': last_row['Low'],
+                    'open': last_row['Open']
+                }
             })
                 
         # Store trades for the given ticker and strategy
